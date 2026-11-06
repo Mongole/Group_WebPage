@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botones - Sctech de Puerto Rico</title>
+
+<!-- ============================================================
+     NOTA GENERAL
+     - Cada botón tiene su propio comentario con su número y nombre.
+     - Cada botón también tiene su propio "id" (ej: id="btn-inicio").
+       Con ese id puedes cambiarle el estilo SOLO a ese botón en el CSS.
+     - Para cambiar un color global, busca los colores en :root (abajo).
+     ============================================================ -->
+
+<!-- Fuente del título (la ancha y gruesa) y fuente del texto -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- COLORES (cámbialos aquí y se actualizan todos) ---------- */
+  :root {
+    --azul: #4557DD;        /* azul principal del título */
+    --azul-claro: #DDE1FA;  /* azul suave */
+    --oscuro: #1c2140;      /* texto y botones oscuros */
+    --blanco: #FFFFFF;
+    --fondo: #F3F4F8;
+  }
+
+  body {
+    margin: 0;
+    padding: 40px;
+    background: var(--fondo);
+    color: var(--oscuro);
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--azul);
+    margin: 0 0 32px;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 40px 0 14px;
+  }
+
+  /* Contenedor que agrupa botones en fila */
+  .fila { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+  /* Efecto al pasar el cursor y al usar el teclado (todos los botones) */
+  button:hover { filter: brightness(0.9); }
+  button:focus-visible { outline: 3px solid var(--oscuro); outline-offset: 3px; }
+  button { cursor: pointer; }
+
+  /* ============================================================
+     ESTILO BASE 1: BOTONES DE LA BARRA SUPERIOR
+     ============================================================ */
+  .btn-nav {
+    min-height: 44px;
+    padding: 10px 22px;
+    border: 0;
+    border-radius: 4px;
+    background: var(--azul);
+    color: var(--blanco);
+    font: 600 15px 'DM Sans', sans-serif;
+  }
+  .barra-superior {
+    padding: 18px 24px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #F7F7F7, #A4A4A4); /* tu degradado gris */
+  }
+
+  /* ============================================================
+     ESTILO BASE 2: BOTONES DE MENÚ DE TEXTO (con subrayado)
+     ============================================================ */
+  .btn-texto {
+    min-height: 44px;
+    padding: 8px 12px;
+    background: transparent;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: var(--oscuro);
+    font: 500 17px 'DM Sans', sans-serif;
+  }
+  .btn-texto:hover { border-bottom-color: var(--azul); filter: none; }
+
+  /* ============================================================
+     ESTILO BASE 3: BOTONES GRANDES (llamadas a la acción)
+     ============================================================ */
+  .btn-grande {
+    min-height: 56px;
+    padding: 16px 34px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font: 800 16px 'Syne', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  /* Variantes de color/forma, una por botón */
+  .relleno   { background: var(--azul);       color: var(--blanco); }
+  .borde     { background: transparent;       color: var(--azul); border-color: var(--azul); }
+  .oscuro    { background: var(--oscuro);     color: var(--blanco); }
+  .suave     { background: var(--azul-claro); color: var(--oscuro); border-radius: 999px; }
+  .blanco    { background: var(--blanco);     color: var(--azul); box-shadow: 0 4px 14px rgba(28,33,64,.18); }
+  .con-flecha { display: inline-flex; align-items: center; gap: 12px; border-radius: 999px; padding: 16px 30px; }
+
+  /* ============================================================
+     ESTILO BASE 4: BOTONES DE ÍCONO (redondos)
+     ============================================================ */
+  .btn-icono {
+    display: flex; align-items: center; justify-content: center;
+    width: 48px; height: 48px; padding: 0;
+    border: 0; border-radius: 50%;
+  }
+  .btn-icono svg { width: 22px; height: 22px; }
+</style>
+</head>
+
+<body>
+
+<h1>Botones · Sctech de Puerto Rico</h1>
+
+
+<!-- ############################################################
+     GRUPO 1: BARRA SUPERIOR
+     Cada botón de aquí usa la clase "btn-nav".
+     ############################################################ -->
+<h2>1 · Barra superior</h2>
+<div class="fila barra-superior">
+
+  <!-- BOTÓN 1.1: INICIO
+       Lleva a la página principal. Cambia el texto entre las etiquetas. -->
+  <button id="btn-inicio" class="btn-nav" type="button">Inicio</button>
+
+  <!-- BOTÓN 1.2: NOSOTROS
+       Información sobre Sctech. -->
+  <button id="btn-nosotros" class="btn-nav" type="button">Nosotros</button>
+
+  <!-- BOTÓN 1.3: PROGRAMAS
+       Lista de programas de ciencias y tecnología. -->
+  <button id="btn-programas" class="btn-nav" type="button">Programas</button>
+
+  <!-- BOTÓN 1.4: ADMISIONES
+       Información para entrar a la universidad. -->
+  <button id="btn-admisiones" class="btn-nav" type="button">Admisiones</button>
+
+  <!-- BOTÓN 1.5: CALENDARIO
+       Calendario académico. -->
+  <button id="btn-calendario" class="btn-nav" type="button">Calendario</button>
+
+  <!-- BOTÓN 1.6: DIRECTORIO
+       Contactos de profesores y oficinas. -->
+  <button id="btn-directorio" class="btn-nav" type="button">Directorio</button>
+
+  <!-- BOTÓN 1.7: CONTACTO
+       Formulario o datos para comunicarse. -->
+  <button id="btn-contacto" class="btn-nav" type="button">Contacto</button>
+
+</div>
+
+
+<!-- ############################################################
+     GRUPO 2: MENÚ DE TEXTO
+     Cada botón usa la clase "btn-texto" (se subraya al pasar el cursor).
+     ############################################################ -->
+<h2>2 · Menú de texto</h2>
+<div class="fila" style="gap: 20px;">
+
+  <!-- BOTÓN 2.1: CONÓCENOS -->
+  <button id="btn-conocenos" class="btn-texto" type="button">Conócenos</button>
+
+  <!-- BOTÓN 2.2: OFERTA ACADÉMICA -->
+  <button id="btn-oferta" class="btn-texto" type="button">Oferta Académica</button>
+
+  <!-- BOTÓN 2.3: LABORATORIOS -->
+  <button id="btn-laboratorios" class="btn-texto" type="button">Laboratorios</button>
+
+  <!-- BOTÓN 2.4: INVESTIGACIÓN -->
+  <button id="btn-investigacion" class="btn-texto" type="button">Investigación</button>
+
+  <!-- BOTÓN 2.5: DOCUMENTOS E INFORMES -->
+  <button id="btn-documentos" class="btn-texto" type="button">Documentos e Informes</button>
+
+</div>
+
+
+<!-- ############################################################
+     GRUPO 3: BOTONES GRANDES
+     Todos usan "btn-grande" + una variante de color (relleno, borde, etc.).
+     ############################################################ -->
+<h2>3 · Botones grandes</h2>
+<div class="fila" style="gap: 16px;">
+
+  <!-- BOTÓN 3.1: CONOCE MÁS
+       Variante "relleno": fondo azul, letras blancas. Es el botón principal. -->
+  <button id="btn-conoce-mas" class="btn-grande relleno" type="button">Conoce más</button>
+
+  <!-- BOTÓN 3.2: VER PROGRAMAS
+       Variante "borde": solo contorno azul. Es el botón secundario. -->
+  <button id="btn-ver-programas" class="btn-grande borde" type="button">Ver programas</button>
+
+  <!-- BOTÓN 3.3: ADMISIONES (grande)
+       Variante "oscuro": fondo azul oscuro. -->
+  <button id="btn-admisiones-grande" class="btn-grande oscuro" type="button">Admisiones</button>
+
+  <!-- BOTÓN 3.4: AYUDA ECONÓMICA
+       Variante "suave": azul clarito y esquinas muy redondas (píldora). -->
+  <button id="btn-ayuda" class="btn-grande suave" type="button">Ayuda económica</button>
+
+  <!-- BOTÓN 3.5: INSCRÍBETE
+       Variante "relleno" + "con-flecha": lleva un ícono de flecha (SVG) al lado del texto. -->
+  <button id="btn-inscribete" class="btn-grande relleno con-flecha" type="button">
+    Inscríbete
+    <!-- Ícono de flecha: se dibuja con líneas, hereda el color del texto -->
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+  </button>
+
+  <!-- BOTÓN 3.6: CONTÁCTANOS
+       Variante "blanco": fondo blanco con sombra. Se ve bien sobre fondos grises. -->
+  <button id="btn-contactanos" class="btn-grande blanco" type="button">Contáctanos</button>
+
+</div>
+
+
+<!-- ############################################################
+     GRUPO 4: BOTONES DE ÍCONO
+     Usan "btn-icono". Como no tienen texto, llevan aria-label
+     (descripción para lectores de pantalla). No lo borres.
+     ############################################################ -->
+<h2>4 · Botones de ícono</h2>
+<div class="fila" style="gap: 16px;">
+
+  <!-- BOTÓN 4.1: FLECHA ANTERIOR (carrusel)
+       Círculo oscuro con flecha hacia la izquierda. -->
+  <button id="btn-anterior" class="btn-icono" type="button" aria-label="Anterior" style="background: var(--oscuro); color: var(--blanco);">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+
+  <!-- BOTÓN 4.2: FLECHA SIGUIENTE (carrusel)
+       Igual que el anterior pero apunta a la derecha. -->
+  <button id="btn-siguiente" class="btn-icono" type="button" aria-label="Siguiente" style="background: var(--oscuro); color: var(--blanco);">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+
+  <!-- BOTÓN 4.3: CHAT DE AYUDA
+       Círculo azul más grande (64px) con globo de chat. Normalmente va en la esquina inferior. -->
+  <button id="btn-chat" class="btn-icono" type="button" aria-label="Abrir chat de ayuda" style="width: 64px; height: 64px; background: var(--azul); color: var(--blanco); box-shadow: 0 4px 14px rgba(28,33,64,.25);">
+    <svg style="width: 28px; height: 28px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H10l-6 4z"/></svg>
+  </button>
+
+  <!-- BOTÓN 4.4: VOLVER ARRIBA
+       Cuadrado con borde azul y flecha hacia arriba. -->
+  <button id="btn-arriba" class="btn-icono" type="button" aria-label="Volver arriba" style="border: 2px solid var(--azul); border-radius: 8px; background: transparent; color: var(--azul);">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+  </button>
+
+  <!-- BOTÓN 4.5: CERRAR (X)
+       Círculo blanco pequeño (40px) para cerrar ventanas o avisos. -->
+  <button id="btn-cerrar" class="btn-icono" type="button" aria-label="Cerrar" style="width: 40px; height: 40px; background: var(--blanco); color: var(--oscuro); box-shadow: 0 2px 8px rgba(28,33,64,.18);">
+    <svg style="width: 18px; height: 18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+
+</div>
+
+</body>
+</html>
