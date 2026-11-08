@@ -4,7 +4,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="Campus Map de SC-TECH de Puerto Rico.">
+	<meta name="description"
+		content="Campus Map de SC-TECH de Puerto Rico.Explora las instalaciones y edificios del recinto.">
 	<title>Campus Map | SC-TECH de Puerto Rico</title>
 	<link rel="stylesheet" href="../assets/css/Campus_Map.css">
 </head>
@@ -15,8 +16,7 @@
 		<nav class="header-nav" aria-label="Navegación principal">
 			<a class="brand" href="../index.html">
 				<span class="brand-icon">
-					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo"
-						width="40">
+					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40">
 				</span>
 				<div style="color: #494fdb">SC-TECH<span>DE PUERTO RICO</span></div>
 			</a>
@@ -31,10 +31,35 @@
 	</header>
 
 	<main>
-		<!-- Contenido principal para el grupo -->
-		<section class="page-content">
-			<h1>Campus Map</h1>
-			<p>Espacio reservado para el contenido de Campus Map...</p>
+		<!-- Contenedor para el texto descriptivo -->
+		<section>
+			<h1>Recinto Virtual 3D - SC-TECH</h1>
+			<p class="intro-lead">
+				Bienvenido al mapa interactivo de SC-TECH de Puerto Rico. Aquí podrás explorar nuestro recinto de manera virtual
+				y familiarizarte con el plano de las instalaciones.
+			</p>
+
+			<!-- Area para instrucciones sobre los controles del mapa -->
+			<div class="instructions-card">
+				<h2>Controles de Navegación</h2>
+				<ul>
+					<li><strong>Modo Órbita:</strong> Arrastra con el clic izquierdo para rotar la cámara y usa la rueda del ratón
+						para hacer zoom. Haz clic sobre cualquier edificio para ver su descripción.</li>
+					<li><strong>Modo Caminar:</strong> Usa las teclas <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> o las
+						flechas del teclado para desplazarte. Mueve el ratón para dirigir la vista y mantén presionada la tecla
+						<kbd>Shift</kbd> para acelerar. Presiona <kbd>Esc</kbd> para salir.
+					</li>
+				</ul>
+			</div>
+		</section>
+
+		<!--
+			Uso de iframe para integrar mapa virtual 
+			Referencias:	https://www.w3schools.com/tags/tag_iframe.asp
+										https://www.w3schools.com/html/html_iframe.asp
+		-->
+		<section class="map-wrapper">
+			<iframe src="mapa-virtual.html" title="Map 3D Interactivo de SC-Tech" allow="fullscreen"></iframe>
 		</section>
 	</main>
 

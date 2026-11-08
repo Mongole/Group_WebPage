@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campus 3D — versión 11</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#b8c9d1;font-family:Inter,Segoe UI,Arial,sans-serif}#view{display:block;width:100%;height:100%}#ui{position:fixed;inset:0;pointer-events:none;color:#f7fafc} .panel{pointer-events:auto;background:rgba(12,24,34,.82);border:1px solid rgba(255,255,255,.18);border-radius:14px;backdrop-filter:blur(12px);box-shadow:0 8px 28px #0a172644}#brand{position:absolute;top:16px;left:16px;padding:13px 16px;max-width:300px}#brand strong{display:block;font-size:15px;letter-spacing:.04em}#brand span{display:block;font-size:11px;color:#b9cbd6;margin-top:5px}#controls{position:absolute;top:16px;right:16px;padding:12px;width:190px}button{border:1px solid #ffffff2c;border-radius:9px;padding:9px 11px;background:#eaf3f7;color:#152633;cursor:pointer;font-weight:650;font-size:12px}button:hover{background:white}#controls button{width:100%;margin:4px 0}#controls .secondary{background:#233947;color:#e8f1f5}#hint{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);padding:10px 15px;font-size:12px;text-align:center;max-width:calc(100% - 32px);color:#dce7ec}#info{position:absolute;bottom:16px;right:16px;padding:12px 14px;width:220px;display:none}#info strong{font-size:13px}#info p{font-size:12px;line-height:1.4;color:#d0dce2;margin:6px 0 0}#loading{position:absolute;inset:0;display:grid;place-items:center;background:#c4d1d6;color:#142530;z-index:10;font-weight:700}#loading div{padding:18px 24px;background:#ffffffcc;border-radius:14px}#crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #fff;border-radius:50%;transform:translate(-50%,-50%);display:none;text-shadow:0 1px 4px #000} .pill{display:inline-block;border:1px solid #ffffff30;border-radius:20px;padding:4px 7px;margin-top:7px;font-size:10px;color:#d9e7ee}
+</style>
+</head>
+<body>
+<canvas id="view"></canvas><div id="loading"><div>Cargando el campus 3D detallado…</div></div>
+<div id="ui"><div id="brand" class="panel"><strong>INSTITUTE OF TECHNOLOGY & RESEARCH</strong><span>Versión 12 · interiores tecnológicos, salones equipados, escaleras transitables y caminar mejorado</span><span class="pill">RECONSTRUCCIÓN 3D · CAMPUS TECNOLÓGICO</span></div><div id="controls" class="panel"><strong style="font-size:13px">Navegación</strong><button id="orbit">Vista mapa / órbita</button><button id="walk" class="secondary">Caminar por el campus</button><button id="reset" class="secondary">Volver a vista general</button><button id="labels" class="secondary">Mostrar / ocultar rótulos</button><p style="font-size:11px;line-height:1.45;color:#c8d7de;margin:7px 2px 1px">Órbita: arrastra para girar, rueda para acercar. Caminar: WASD o flechas; Shift para caminar más rápido; ratón para mirar; Esc para salir. Entra por las puertas, recorre los salones y sube por las escaleras; mantén Shift para acelerar.</p></div><div id="hint" class="panel">Arrastra para inspeccionar el recinto · rueda para acercar · pulsa un edificio para identificarlo</div><div id="info" class="panel"><strong id="infoTitle"></strong><p id="infoText"></p></div><div id="crosshair">+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+window.addEventListener('error',e=>{const l=document.querySelector('#loading');if(l){l.style.display='grid';l.innerHTML='<div style="max-width:560px;line-height:1.5"><b>No se pudo iniciar el campus 3D.</b><br>Comprueba tu conexión a internet y vuelve a abrir el archivo.<br><small>'+String(e.message||'Error de carga')+'</small></div>';}});
+const OrbitControls = THREE.OrbitControls;
+const canvas=document.querySelector('#view'), loading=document.querySelector('#loading');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap; renderer.outputEncoding=THREE.sRGBEncoding; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12; renderer.physicallyCorrectLights=true;
+const scene=new THREE.Scene();scene.background=new THREE.Color('#b8c9d1');scene.fog=new THREE.Fog('#b8c9d1',340,760);
+const camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,700);camera.position.set(118,122,145);
+scene.add(new THREE.HemisphereLight(0xeaf5ff,0x45483b,1.9));const ambientFill=new THREE.DirectionalLight(0xd5e7ff,.65);ambientFill.position.set(90,65,-75);scene.add(ambientFill);const sun=new THREE.DirectionalLight(0xfff0d8,4.0);sun.position.set(-90,145,80);sun.castShadow=true;sun.shadow.mapSize.set(3072,3072);sun.shadow.camera.left=-170;sun.shadow.camera.right=170;sun.shadow.camera.top=170;sun.shadow.camera.bottom=-170;scene.add(sun);
+const orbit=new OrbitControls(camera,renderer.domElement);orbit.target.set(0,6,-8);orbit.enableDamping=true;orbit.maxPolarAngle=Math.PI*.48;orbit.minDistance=18;orbit.maxDistance=270;
+const mat=(color,rough=.82,metal=0)=>new THREE.MeshStandardMaterial({color,roughness:rough,metalness:metal});
+// Shared pavement materials are initialized before any scene-building functions run.
+const curbMat=mat('#aaa99f'), jointMat=mat('#999d99');
+const asphaltEdge=mat('#343b3c'), lanePaint=mat('#e8e4d4'), curbTop=mat('#d1cec4'), tactile=mat('#c5bca7');
+// Procedural surface maps add subtle scale, panel joints and natural variation without external image dependencies.
+function proceduralTexture(base,kind='concrete'){const c=document.createElement('canvas');c.width=512;c.height=512;const q=c.getContext('2d');q.fillStyle=base;q.fillRect(0,0,512,512);let seed=17;const rand=()=>{seed=(seed*9301+49297)%233280;return seed/233280};for(let i=0;i<24000;i++){const v=rand();q.fillStyle=v>.5?'rgba(255,255,255,.045)':'rgba(0,0,0,.045)';q.fillRect(rand()*512,rand()*512,1+rand()*3,1+rand()*2)}for(let i=0;i<95;i++){q.strokeStyle=rand()>.5?'rgba(255,255,255,.025)':'rgba(0,0,0,.025)';q.lineWidth=.5+rand()*1.5;q.beginPath();let xx=rand()*512, yy=rand()*512;q.moveTo(xx,yy);q.lineTo(xx+(rand()-.5)*35,yy+(rand()-.5)*8);q.stroke()}if(kind==='concrete'){q.strokeStyle='rgba(60,65,64,.12)';q.lineWidth=1;for(let y=0;y<512;y+=64){q.beginPath();q.moveTo(0,y);q.lineTo(512,y);q.stroke()}for(let x=0;x<512;x+=128){q.beginPath();q.moveTo(x,0);q.lineTo(x,512);q.stroke()}}if(kind==='road'){q.strokeStyle='rgba(255,255,255,.025)';for(let i=0;i<160;i++){q.beginPath();q.moveTo(rand()*512,rand()*512);q.lineTo(rand()*512,rand()*512);q.stroke()}}const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(2,2);t.anisotropy=4;return t}
+const concrete= new THREE.MeshStandardMaterial({color:'#d0cec4',map:proceduralTexture('#d0cec4','concrete'),roughness:.92}), pale=new THREE.MeshStandardMaterial({color:'#dfdbcf',map:proceduralTexture('#dfdbcf','concrete'),roughness:.88}), dark=mat('#5a666a'), glass= new THREE.MeshStandardMaterial({color:'#648696',roughness:.18,metalness:.3}), windowMat=new THREE.MeshStandardMaterial({color:'#284653',roughness:.22,metalness:.2}), roof=new THREE.MeshStandardMaterial({color:'#b7b5ab',map:proceduralTexture('#b7b5ab','concrete'),roughness:.95}), roadMat=new THREE.MeshStandardMaterial({color:'#42494a',map:proceduralTexture('#42494a','road'),roughness:1}), sidewalk=mat('#b8b7ae'), grass=mat('#607d4b'), grass2=mat('#78935a'), white=mat('#ece9df'), red=mat('#bd493b'), yellow=mat('#edc84c'), metal=mat('#7b888c',.45,.65);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(420,420),grass);ground.rotation.x=-Math.PI/2;ground.position.y=-.25;ground.receiveShadow=true;scene.add(ground);
+function box(parent,x,y,z,w,h,d,material,cast=true){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y+h/2,z);m.castShadow=cast;m.receiveShadow=true;parent.add(m);return m}
+function road(x,z,w,d,rot=0){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),roadMat);m.rotation.x=-Math.PI/2;m.rotation.z=rot;m.position.set(x,.005,z);scene.add(m);return m}
+// campus roads and perimeter
+road(0,-145,290,8);road(0,145,290,8);road(-145,0,8,290);road(145,0,8,290);
+road(0,0,18,150);road(0,0,240,14);road(-65,0,12,150);road(65,0,12,150);road(0,-65,142,12);road(0,65,142,12);road(0,52,18,35);
+// markings
+for(let z=-70;z<71;z+=8){box(scene,0,.025,z,0.22,.015,3.5,white,false)}
+for(let x=-62;x<63;x+=8){box(scene,x,.026,0,3.5,.015,.22,white,false)}
+// sidewalks paths
+const pathmat=mat('#c7c7bc');function path(x,z,w,d){let p=new THREE.Mesh(new THREE.PlaneGeometry(w,d),pathmat);p.rotation.x=-Math.PI/2;p.position.set(x,.03,z);scene.add(p)}
+path(0,31,70,5);path(-3,18,5,30);path(25,30,5,30);path(-27,30,5,30);path(0,-30,82,4);
+const buildings=[];
+function building(name,desc,x,z,w,d,h,floors=3,accent=false){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);box(g,0,.1,0,w,h,d,concrete);box(g,0,h+.1,0,w+1,.45,d+1,roof);box(g,0,.35,d/2+.13,w*.72,.5,.22,dark); // entrance band
+// vertical facade pilasters and repetitive window bays
+const n=Math.max(3,Math.floor(w/4.4));for(let floor=0;floor<floors;floor++){let yy=1.35+floor*(h-1.6)/floors;let winH=Math.min(1.35,(h-2)/floors*.62);for(let i=0;i<n;i++){let xx=-w/2+1.7+i*(w-3.4)/(n-1);for(const face of [-1,1]){const zz=face*(d/2+.045);box(g,xx,yy,zz,1.08,winH,.12,windowMat,false);box(g,xx,yy+winH,face*(d/2+.12),1.12,.07,.12,metal,false);box(g,xx,yy-.12,face*(d/2+.12),1.12,.08,.12,pale,false);if((i+floor)%4===0)box(g,xx,yy+.12,face*(d/2+.115),.025,winH-.22,.04,metal,false)}}for(let side of [-1,1])for(let j=0;j<Math.max(2,Math.floor(d/5));j++){let zz=-d/2+2+j*(d-4)/(Math.max(2,Math.floor(d/5))-1);box(g,side*(w/2+.055),yy,zz,.12,winH,1.25,windowMat,false);box(g,side*(w/2+.12),yy+.05,zz,.07,winH+.12,1.34,metal,false)}}
+// corner piers
+for(let xx of [-w/2+.3,w/2-.3])box(g,xx,.2,d/2+.08,.45,h-.3,.32,pale);
+// Recessed-looking frames, narrow mullions and floor bands make the repeated glazing read as real architecture.
+for(let floor=0;floor<floors;floor++){const fy=1.2+floor*(h-1.6)/floors;box(g,0,fy-.18,d/2+.16,w-.7,.13,.12,pale,false);for(let i=0;i<n;i++){let xx=-w/2+1.7+i*(w-3.4)/(n-1);box(g,xx-.55,fy,d/2+.13,.07,Math.min(1.35,(h-2)/floors*.62),.08,metal,false);box(g,xx+.55,fy,d/2+.13,.07,Math.min(1.35,(h-2)/floors*.62),.08,metal,false);box(g,xx,fy,d/2+.145,.055,Math.min(1.35,(h-2)/floors*.62),.06,metal,false)}}
+// Rooftop service equipment, vents and parapet strips.
+box(g,0,h+.42,-d*.22,w*.82,.28,.28,pale,false);for(let r=0;r<Math.max(2,Math.floor(w/10));r++){const ex=-w*.34+r*(w*.68/(Math.max(2,Math.floor(w/10))-1));box(g,ex,h+.58,-d*.12,1.35,.55,1.05,dark,false);box(g,ex,h+.88,-d*.12,1.05,.08,.8,metal,false)}
+// Deep entry portal, layered canopy, steps, rainwater downpipes and facade expansion joints.
+box(g,0,.25,d/2+.42,w*.43,.35,.7,dark,false);box(g,0,1.15,d/2+.34,w*.34,1.8,.2,glass,false);box(g,0,2.95,d/2+.55,w*.5,.22,1.1,pale,false);for(let st=0;st<3;st++)box(g,0,.08+st*.16,d/2+.8+st*.34,w*.46,.14,.42,sidewalk,false);for(let xx of [-w/2+.9,w/2-.9])box(g,xx,.2,d/2+.22,.12,h-.25,.16,metal,false);for(let floor=1;floor<floors;floor++){let yy=.9+floor*(h-1.2)/floors;box(g,0,yy,-d/2-.09,w-.5,.1,.1,pale,false)}
+// High-detail facade pass: recessed spandrel bands, sill shadows, rain leaders and wall lights.
+for(let floor=0;floor<floors;floor++){
+ const fy=1.05+floor*(h-1.6)/floors;
+ box(g,0,fy-.24,d/2+.19,w-.45,.09,.10,dark,false);
+ box(g,0,fy-.31,d/2+.20,w-.45,.045,.11,pale,false);
+ for(let side of [-1,1]){
+  box(g,side*(w/2+.12),fy-.24,0,.08,.10,d-.7,dark,false);
+  box(g,side*(w/2+.13),fy-.31,0,.08,.045,d-.7,pale,false);
+ }
+}
+// Fine facade pilasters and deep sill lips create real shadow lines at human scale.
+for(let i=0;i<n;i++){
+ const xx=-w/2+1.7+i*(w-3.4)/(n-1);
+ box(g,xx,0,d/2+.11,.055,h-.4,.10,metal,false);
+ box(g,xx,.95,d/2+.23,1.28,.055,.24,pale,false);
+}
+// Exterior wall sconces and vertical rainwater downpipes at corners.
+for(const side of [-1,1]){
+ const pipe= new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,h,8),metal);pipe.position.set(side*(w/2-.25),h/2+.2,d/2+.20);g.add(pipe);
+ for(let floor=0;floor<floors;floor++){
+  const fy=1.8+floor*(h-2)/floors;
+  box(g,side*(w/2-.8),fy,d/2+.23,.22,.32,.12,metal,false);
+  box(g,side*(w/2-.8),fy-.03,d/2+.30,.13,.18,.035,white,false);
+ }
+}
+// Roof parapet, skylight strips, drains and varied HVAC units.
+for(const side of [-1,1]){box(g,side*(w/2-.12),h+.48,0,.22,.42,d+.2,pale,false);box(g,0,h+.48,side*(d/2-.12),w+.2,.42,.22,pale,false)}for(let r=0;r<Math.max(2,Math.floor(w/10));r++){const ex=-w*.34+r*(w*.68/(Math.max(2,Math.floor(w/10))-1));box(g,ex,h+.58,-d*.12,1.35,.55,1.05,dark,false);box(g,ex,h+.88,-d*.12,1.05,.08,.8,metal,false);for(let sl=-2;sl<=2;sl++)box(g,ex+sl*.15,h+.9,-d*.12,.035,.035,.72,pale,false)}box(g,-w*.18,h+.49,d*.2,w*.23,.16,d*.22,glass,false);
+if(accent){box(g,0,h*.55,d/2+.24,w*.25,h*.68,.35,glass);box(g,0,h+.85,d/2+.3,4,1.5,.5,pale);box(g,0,h+.86,d/2+.57,2.7,1.1,.08,windowMat,false);}
+const label=makeLabel(name);label.position.set(x,h+5,z);scene.add(label);buildings.push({name,desc,obj:g,label});return g}
+function makeLabel(txt){const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='rgba(12,28,37,.82)';ctx.roundRect(4,4,504,120,18);ctx.fill();ctx.font='bold 31px Arial';ctx.textAlign='center';ctx.fillStyle='#f4f7f8';ctx.fillText(txt,256,77);const t=new THREE.CanvasTexture(c);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthTest:false}));s.scale.set(15,3.75,1);return s}
+// Reorganización según las vistas aéreas de referencia:
+// entrada H al frente/centro; alas académicas abiertas a ambos lados;
+// laboratorios al extremo izquierdo; aulas en la parte posterior izquierda;
+// estacionamiento/seguridad detrás del núcleo; helipuerto sobre el bloque posterior derecho.
+const labBlock=building('AULAS Y LABORATORIOS','Bloque amplio y bajo de laboratorios, situado al extremo izquierdo del conjunto.',-49,2,34,29,9,2);
+const classBlock=building('AULAS · A Y B','Bloque académico posterior, formado por alas conectadas alrededor de un patio.',-25,-29,39,25,13,3);
+const mainBlock=building('EDIFICIO CENTRAL · H','Acceso principal y recepción en el centro del frente del recinto.',0,17,25,18,14,3,true);
+const adminBlock=building('ADMINISTRACIÓN','Ala de administración y facultad, extendida hacia el lado derecho de la entrada.',35,8,39,25,12,3);
+// Front composition rebuilt to match the original aerial reference: a taller glazed
+// central entrance pavilion, two long lower wings opening toward the forecourt,
+// and recessed glazed joints that make the three volumes read as one connected complex.
+// The old overlapping box-like connectors are deliberately replaced by clean, joined masses.
+function joinedWing(name,desc,x,z,w,d,h,side){
+  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+  // Main wing with a continuous roof/parapet and a recessed darker base.
+  box(g,0,.12,0,w,h,d,concrete);box(g,0,h+.12,0,w+.55,.42,d+.55,roof);
+  box(g,0,.18,d/2+.09,w*.94,.36,.18,dark,false);
+  const bays=Math.floor(w/3.7);
+  for(let i=0;i<bays;i++){
+    const xx=-w/2+1.9+i*(w-3.8)/Math.max(1,bays-1);
+    // Deep-set ribbon windows, mullions and concrete sunshades.
+    for(let floor=0;floor<2;floor++){
+      const yy=1.05+floor*3.05;
+      box(g,xx,yy, d/2+.055,2.15,1.55,.10,windowMat,false);
+      box(g,xx,yy+1.61,d/2+.14,2.28,.13,.30,pale,false);
+      box(g,xx,yy-.12,d/2+.14,2.28,.12,.30,pale,false);
+      box(g,xx-1.08,yy+.72,d/2+.13,.09,1.55,.16,metal,false);
+      box(g,xx+1.08,yy+.72,d/2+.13,.09,1.55,.16,metal,false);
+    }
+    box(g,xx,6.1,d/2+.18,.12,.18,.34,metal,false);
+  }
+  // End wall glazing and vertical concrete piers where the wing meets the main block.
+  for(const end of [-1,1]){box(g,end*w/2,2.1,0,.32,4.1,d*.82,pale,false);}
+  // Covered glass link at the inner end: visible glazing, slim mullions and a flat canopy.
+  const linkX=-side*(w/2-1.0);
+  box(g,linkX,2.15,-d/2-.55,2.2,3.9,1.05,glass,false);
+  for(let k=0;k<4;k++)box(g,linkX-0.9+k*.6,2.15,-d/2-.55,.055,3.9,1.12,metal,false);
+  box(g,linkX,4.25,-d/2-.55,3.2,.28,2.5,roof,false);
+  const label=makeLabel(name);label.position.set(x, h+4,z);scene.add(label);buildings.push({name,desc,obj:g,label});return g;
+}
+const westWing=joinedWing('ALA ACADÉMICA OESTE','Ala frontal de laboratorios conectada al pabellón central mediante un enlace acristalado.',-24,23,34,18,8,-1);
+const eastWing=joinedWing('ALA ADMINISTRATIVA ESTE','Ala frontal de administración y facultad conectada al pabellón central mediante un enlace acristalado.',24,23,34,18,8,1);
+// Glazed central lobby bridge and a taller entrance portal create a legible continuous H-shaped front.
+const lobbyLink=new THREE.Group();lobbyLink.position.set(0,0,18);scene.add(lobbyLink);
+box(lobbyLink,0,.15,0,12.8,8.8,15.5,glass);
+box(lobbyLink,0,.12,0,13.5,.42,16.2,dark,false);
+for(let x=-5.7;x<=5.71;x+=1.9)box(lobbyLink,x,4.45,7.82,.12,8.1,.16,metal,false);
+box(lobbyLink,0,8.95,0,14.2,.48,16.8,roof);
+// A broad recessed entrance portal with deep reveals, glass doors and canopy.
+box(lobbyLink,0,4.25,7.96,5.8,7.3,.32,concrete,false);
+box(lobbyLink,0,2.0,8.17,3.9,3.7,.12,windowMat,false);
+for(let x=-1.35;x<=1.36;x+=.9)box(lobbyLink,x,2.0,8.25,.07,3.7,.12,metal,false);
+box(lobbyLink,0,6.2,8.65,8.4,.42,2.0,pale,false);
+box(lobbyLink,0,9.45,8.0,7.5,.28,.45,metal,false);
+const securityBlock=building('ESTACIONAMIENTO Y SEGURIDAD','Edificio posterior de varios niveles para estacionamiento y control.',5,-51,36,24,16,4);
+const emergencyBlock=building('SERVICIOS DE EMERGENCIA','Bloque de servicios de emergencia en la parte posterior derecha, con helipuerto en la azotea.',48,-39,38,29,12,3);
+// Torre de vigilancia elevada, situada detrás del núcleo y delante del bloque de estacionamiento.
+const tower=new THREE.Group();tower.position.set(9,0,-27);scene.add(tower);box(tower,0,0,0,5.5,20,5.5,concrete);box(tower,-1,20,0,9,3.8,9,glass);box(tower,-1,23.8,0,10,.7,10,roof);for(let y=3;y<19;y+=4)box(tower,2.81,y,0,.12,1.3,3.8,windowMat,false);const tl=makeLabel('TORRE DE VIGILANCIA');tl.position.set(9,29,-27);scene.add(tl);buildings.push({name:'TORRE DE VIGILANCIA',desc:'Torre elevada de observación y control de seguridad.',obj:tower,label:tl});
+// Antena roja y blanca en el extremo posterior derecho, separada del helipuerto.
+const ant=new THREE.Group();ant.position.set(78,0,-30);scene.add(ant);for(let y=0;y<37;y+=2){let width=5.5*(1-y/48);const postGeo=new THREE.CylinderGeometry(Math.max(.07,width*.03),Math.max(.08,width*.035),2.1,6);for(let xx of [-width/2,width/2]){let p=new THREE.Mesh(postGeo,y>25?red:metal);p.position.set(xx,y+1,0);p.castShadow=true;ant.add(p)}box(ant,0,y+.95,0,width,.12,.16,y%4===0?red:metal);for(let side of [-1,1]){let beam=new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,Math.sqrt(4+width*width),6),red);beam.position.set(side*width/4,y+1,0);beam.rotation.z=side*Math.atan2(2,width);ant.add(beam)}}for(let y=10;y<35;y+=6){let dish=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.1,.18,20),white);dish.rotation.x=Math.PI/2;dish.position.set(1.1,y,0);ant.add(dish)}const al=makeLabel('ANTENA DE COMUNICACIONES');al.position.set(78,42,-30);scene.add(al);buildings.push({name:'ANTENA DE COMUNICACIONES',desc:'Antena de celosía roja y blanca con platos de comunicación.',obj:ant,label:al});
+// Helipad placed on the emergency-services roof, matching the elevated rooftop pad in the reference.
+const padY=12.18,padX=48,padZ=-39;
+const pad=new THREE.Mesh(new THREE.CircleGeometry(15.5,64),mat('#777d7c'));pad.rotation.x=-Math.PI/2;pad.position.set(padX,padY,padZ);pad.receiveShadow=true;scene.add(pad);
+const ring=new THREE.Mesh(new THREE.RingGeometry(12.7,13.15,64),yellow);ring.rotation.x=-Math.PI/2;ring.position.set(padX,padY+.035,padZ);scene.add(ring);
+box(scene,padX,padY+.06,padZ,2.4,.03,14,white,false);box(scene,padX,padY+.07,padZ,11,.03,2.4,white,false);
+box(scene,padX-3,padY+.09,padZ,1,.04,6,white,false);box(scene,padX+3,padY+.09,padZ,1,.04,6,white,false);box(scene,padX,padY+.09,padZ,7,.04,1,white,false);
+const hl=makeLabel('HELIPUERTO');hl.position.set(padX,padY+5,padZ);scene.add(hl);buildings.push({name:'HELIPUERTO',desc:'Plataforma elevada de aterrizaje en la azotea del bloque de emergencias.',obj:pad,label:hl});
+// Helicóptero de emergencia con cabina, cristales divididos, cola, estabilizadores,
+// tren de aterrizaje, focos, remaches y rotor de cuatro palas.
+const heli=new THREE.Group();heli.position.set(padX,padY+.25,padZ);heli.rotation.y=-.22;scene.add(heli);
+const heliBody=mat('#29363b',.42,.32), heliLight=mat('#e6e4d9',.48,.12), heliRed=mat('#bd3f32',.4,.18), heliGlass=new THREE.MeshPhysicalMaterial({color:'#5c8998',roughness:.13,metalness:.25,transparent:true,opacity:.88,clearcoat:1,clearcoatRoughness:.08}), rubber=mat('#171c1f',.95), rotorMetal=mat('#424b50',.38,.72);
+function ellipsoid(parent,x,y,z,sx,sy,sz,material,seg=24){const m=new THREE.Mesh(new THREE.SphereGeometry(1,seg,16),material);m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
+ellipsoid(heli,0,1.2,0,3.5,1.05,1.18,heliBody);ellipsoid(heli,2.55,1.25,0,1.45,.86,1.05,heliLight);ellipsoid(heli,2.72,1.42,0,1.25,.66,.91,heliGlass);
+// Nose glazing and side cockpit windows, separated by narrow metal frames.
+for(const side of [-1,1]){ellipsoid(heli,1.65,1.58,side*.84,.72,.47,.11,heliGlass);ellipsoid(heli,.35,1.63,side*1.08,.78,.46,.095,heliGlass);ellipsoid(heli,-1.0,1.58,side*1.07,.72,.42,.09,heliGlass);box(heli,.97,1.6,side*1.13,.075,.98,.08,rotorMetal,false);box(heli,-.34,1.6,side*1.15,.07,.9,.08,rotorMetal,false);box(heli,-1.65,1.55,side*1.05,.09,.8,.08,rotorMetal,false);box(heli,.0,.78,side*1.12,2.8,.12,.08,heliRed,false);}
+// Rear tapering tail boom, tail fin and horizontal stabilizer.
+const boom=new THREE.Mesh(new THREE.CylinderGeometry(.18,.48,5.9,12),heliBody);boom.rotation.z=Math.PI/2;boom.position.set(-4.45,1.42,0);boom.castShadow=true;heli.add(boom);
+const fin=box(heli,-7.0,2.25,0,.22,2.15,.72,heliBody);fin.rotation.z=-.12;box(heli,-6.9,2.7,0,.32,.3,1.45,heliLight);box(heli,-5.9,1.52,0,1.25,.12,2.4,heliLight);
+// Tail rotor on the left end of the boom.
+const tailRotor=new THREE.Group();tailRotor.position.set(-7.02,2.25,.48);heli.add(tailRotor);for(let i=0;i<4;i++){const blade=box(tailRotor,0,1.0,0,.16,1.9,.08,rotorMetal,false);blade.rotation.z=i*Math.PI/2;}const tailHub=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.2,16),metal);tailHub.rotation.x=Math.PI/2;tailHub.position.z=.08;tailRotor.add(tailHub);
+// Main rotor mast and four long tapered-looking blades.
+const mast=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,.8,12),rotorMetal);mast.position.set(-.15,2.25,0);heli.add(mast);const rotor=new THREE.Group();rotor.position.set(-.15,2.72,0);heli.add(rotor);for(let i=0;i<4;i++){const blade=box(rotor,0,0,0,1.05,.09,13.8,rotorMetal,false);blade.rotation.y=i*Math.PI/2;const tip=box(rotor,0,0,0,.72,.095,1.15,heliRed,false);tip.position.z=(i%2===0?1:-1)*6.75;tip.rotation.y=i*Math.PI/2;}
+ellipsoid(heli,-.15,2.78,0,.3,.16,.3,heliLight,16);
+// Skids with curved-looking supports, landing lights, door handles and small details.
+for(const z of [-.82,.82]){const skid=new THREE.Mesh(new THREE.CylinderGeometry(.105,.105,5.9,10),rubber);skid.rotation.z=Math.PI/2;skid.position.set(-.05,.12,z);skid.castShadow=true;heli.add(skid);for(const x of [-1.45,1.05]){const strut=new THREE.Mesh(new THREE.CylinderGeometry(.07,.1,1.25,8),rotorMetal);strut.position.set(x,.52,z);strut.rotation.z=(x<0?-.25:.25);heli.add(strut)}}
+for(const side of [-1,1]){ellipsoid(heli,3.65,1.0,side*.48,.16,.13,.12,white,12);box(heli,-.7,1.22,side*1.18,.72,.035,.035,heliLight,false);for(let r=0;r<5;r++)ellipsoid(heli,-1.75+r*.24,1.1,side*1.16,.035,.035,.025,metal,8)}
+// Anti-collision beacon and exhausts.
+ellipsoid(heli,-.4,2.05,0,.14,.11,.14,red,12);for(const z of [-.42,.42]){const ex=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,.55,10),dark);ex.rotation.z=Math.PI/2;ex.position.set(-1.7,1.9,z);heli.add(ex)}
+// Landscaped entrance forecourt inspired by the original image: generous curved
+// pedestrian paving, a planted central island, a larger tiered fountain, palms and lawns.
+const plaza=new THREE.Mesh(new THREE.CircleGeometry(21,96),sidewalk);plaza.rotation.x=-Math.PI/2;plaza.position.set(0,.055,45);plaza.receiveShadow=true;scene.add(plaza);
+const plazaOuter=new THREE.Mesh(new THREE.RingGeometry(21,22.2,96),curbTop);plazaOuter.rotation.x=-Math.PI/2;plazaOuter.position.set(0,.07,45);scene.add(plazaOuter);
+// Radial paving joints and broad curved garden beds around the main fountain.
+for(let a=0;a<Math.PI*2;a+=Math.PI/12){const r=14.2;const joint=box(scene,Math.sin(a)*r,.072,45+Math.cos(a)*r,.075,.018,11.8,jointMat,false);joint.rotation.y=a;}
+const island=new THREE.Mesh(new THREE.CircleGeometry(8.9,80),grass2);island.rotation.x=-Math.PI/2;island.position.set(0,.095,45);scene.add(island);
+const fountainBase=new THREE.Mesh(new THREE.CylinderGeometry(4.25,4.55,.48,64),pale);fountainBase.position.set(0,.31,45);fountainBase.castShadow=true;fountainBase.receiveShadow=true;scene.add(fountainBase);
+const fountainRim=new THREE.Mesh(new THREE.CylinderGeometry(4.05,4.05,.34,64,1,true),curbMat);fountainRim.position.set(0,.68,45);scene.add(fountainRim);
+const water=new THREE.Mesh(new THREE.CylinderGeometry(3.92,3.92,.09,64),new THREE.MeshPhysicalMaterial({color:'#4d91a0',roughness:.16,metalness:.18,transparent:true,opacity:.9,clearcoat:1}));water.position.set(0,.67,45);scene.add(water);
+const innerBowl=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.9,.48,48),pale);innerBowl.position.set(0,.91,45);scene.add(innerBowl);
+const fountainColumn=new THREE.Mesh(new THREE.CylinderGeometry(.38,.62,1.45,24),white);fountainColumn.position.set(0,1.62,45);fountainColumn.castShadow=true;scene.add(fountainColumn);
+const fountainCap=new THREE.Mesh(new THREE.CylinderGeometry(.9,.62,.22,32),pale);fountainCap.position.set(0,2.42,45);scene.add(fountainCap);
+for(let i=0;i<8;i++){const a=i*Math.PI/4;const jet=new THREE.Mesh(new THREE.CylinderGeometry(.035,.07,1.05,8),glass);jet.position.set(Math.cos(a)*1.25,1.42,45+Math.sin(a)*1.25);jet.rotation.z=Math.cos(a)*-.35;jet.rotation.x=Math.sin(a)*.35;scene.add(jet);}
+// Carved stone coping, inner concentric rings, underwater lights and animated water details.
+const fountainMoving=[];for(const rr of [2.35,3.15,3.72]){const ring=new THREE.Mesh(new THREE.TorusGeometry(rr,.055,8,64),metal);ring.rotation.x=Math.PI/2;ring.position.set(0,.77,45);scene.add(ring)}
+for(let i=0;i<12;i++){const a=i*Math.PI/6;const light=new THREE.PointLight(0x8bd9ef,.55,5,2);light.position.set(Math.cos(a)*3.35,.48,45+Math.sin(a)*3.35);scene.add(light);const lens=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),new THREE.MeshStandardMaterial({color:'#a8f0ff',emissive:'#39c9ee',emissiveIntensity:1.1}));lens.position.copy(light.position);scene.add(lens)}
+for(let i=0;i<10;i++){const drop=new THREE.Mesh(new THREE.SphereGeometry(.07+(i%3)*.025,8,6),new THREE.MeshStandardMaterial({color:'#bdefff',transparent:true,opacity:.72,roughness:.12}));drop.position.set(Math.cos(i*2.4)*1.25,1.55+(i%4)*.13,45+Math.sin(i*2.4)*1.25);scene.add(drop);fountainMoving.push({o:drop,a:i*2.4,base:drop.position.y})}
+// Palm-like trees, flowering shrubs and clipped planting beds frame the arrival walk.
+function palm(x,z,s=1){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.34*s,5.1*s,12),barkMat);trunk.position.y=2.55*s;trunk.castShadow=true;g.add(trunk);for(let i=0;i<10;i++){const a=i*Math.PI*2/10;const frond=new THREE.Mesh(new THREE.ConeGeometry(.28*s,3.4*s,7),grass2);frond.position.set(Math.cos(a)*1.35*s,5.15*s+Math.sin(a*.7)*.22,Math.sin(a)*1.35*s);frond.rotation.z=Math.cos(a)*-.78;frond.rotation.x=Math.sin(a)*.78;frond.castShadow=true;g.add(frond);}return g}
+const barkMat=mat('#74543b');
+for(const [x,z,s] of [[-15,39,.9],[-11,53,.75],[14,39,.9],[18,52,.78],[-34,48,1.05],[34,48,1.05],[-42,29,.85],[43,29,.85]])palm(x,z,s);
+function gardenBed(x,z,w,d){const soil=new THREE.Mesh(new THREE.BoxGeometry(w,.18,d),mat('#514c3c'));soil.position.set(x,.12,z);scene.add(soil);const turf=new THREE.Mesh(new THREE.BoxGeometry(w-.35,.12,d-.35),grass);turf.position.set(x,.23,z);scene.add(turf);for(let i=0;i<Math.floor(w/1.5);i++){const sx=x-w/2+.8+i*1.5;const bush=new THREE.Mesh(new THREE.IcosahedronGeometry(.48+(i%3)*.08,1),i%2?grass2:grass);bush.position.set(sx,.72,z);bush.scale.set(1.2,.8,1);bush.castShadow=true;scene.add(bush)}}
+gardenBed(-25,48,13,3.2);gardenBed(25,48,13,3.2);gardenBed(-38,16,3.2,15);gardenBed(38,16,3.2,15);
+// Curved approach walk with paired low planting strips and discreet bollard lights.
+path(0,59,9,20);for(const x of [-5.2,5.2]){for(let z=52;z<=67;z+=3.8){const bollard=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,.85,10),metal);bollard.position.set(x,.43,z);scene.add(bollard);const cap=new THREE.Mesh(new THREE.CylinderGeometry(.17,.17,.08,12),white);cap.position.set(x,.88,z);scene.add(cap)}}
+// The old cramped parking marks beside the service building were removed;
+// dedicated, connected parking lots are created after the vehicle model below.
+// trees, shrubs, lamp posts
+function tree(x,z,s=1){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const bark=mat('#594333',.98),barkLight=mat('#79583e',.98),leafMats=[mat('#284b30',.98),mat('#365d38',.96),mat('#477044',.96),mat('#5c7b49',.98),mat('#718a50',.98)];
+// Trunk with root flare, branch forks and irregular layered foliage for a less geometric silhouette.
+const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.17*s,.43*s,3.25*s,12),bark);trunk.position.y=1.62*s;trunk.castShadow=true;trunk.receiveShadow=true;g.add(trunk);
+for(let i=0;i<5;i++){const a=i*Math.PI*2/5+.3;const root=new THREE.Mesh(new THREE.CylinderGeometry(.035*s,.15*s,1.25*s,7),barkLight);root.position.set(Math.cos(a)*.34*s,.23*s,Math.sin(a)*.34*s);root.rotation.z=Math.cos(a)*.45;root.rotation.x=Math.sin(a)*.4;g.add(root)}
+for(let i=0;i<7;i++){const a=i*2.399;const y=(1.55+(i%3)*.42)*s;const branch=new THREE.Mesh(new THREE.CylinderGeometry(.035*s,.105*s,1.35*s,7),barkLight);branch.position.set(Math.cos(a)*.63*s,y,Math.sin(a)*.63*s);branch.rotation.z=Math.cos(a)*.7;branch.rotation.x=Math.sin(a)*.7;branch.castShadow=true;g.add(branch)}
+for(let i=0;i<11;i++){const a=i*2.399, level=Math.floor(i/4);const r=(.85+(i%3)*.22)*s;const crown=new THREE.Mesh(new THREE.IcosahedronGeometry(r,2),leafMats[i%leafMats.length]);crown.position.set(Math.cos(a)*.82*s,(2.55+level*.62+(i%2)*.2)*s,Math.sin(a)*.72*s);crown.scale.set(.95+(i%3)*.12,.85+(i%4)*.09,1.0+(i%2)*.12);crown.rotation.set(i*.31,i*.7,i*.19);crown.castShadow=true;crown.receiveShadow=true;g.add(crown)}
+// Tiny leaf clusters soften the outer crown edges.
+for(let i=0;i<8;i++){const a=i*Math.PI/4;const leaf=new THREE.Mesh(new THREE.SphereGeometry(.48*s,10,8),leafMats[(i+2)%leafMats.length]);leaf.position.set(Math.cos(a)*1.55*s,(3.0+(i%3)*.48)*s,Math.sin(a)*1.45*s);leaf.scale.set(1,.8,1.05);leaf.castShadow=true;g.add(leaf)}return g}
+for(let z=-76;z<=76;z+=11){tree(-78,z,.9+Math.random()*.35);tree(78,z,.9+Math.random()*.35)}for(let x=-65;x<=65;x+=11){tree(x,-79,.8+Math.random()*.4);tree(x,79,.8+Math.random()*.4)}for(const [x,z] of [[-59,18],[-58,-14],[-49,42],[-30,43],[29,43],[53,22],[56,-8],[28,-24],[-9,-56],[-32,-44],[-50,-52],[10,58],[24,58],[-23,58]])tree(x,z,.65+Math.random()*.25);
+function lamp(x,z){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);box(g,0,0,0,.18,5,.18,metal);box(g,.6,4.9,0,1.3,.12,.18,metal);let l=new THREE.PointLight(0xffe3a5,.15,9);l.position.set(.9,4.7,0);g.add(l)}for(let z=-60;z<65;z+=18){lamp(-10,z);lamp(10,z)}
+// small solar array near right-front
+const solar=new THREE.Group();solar.position.set(53,0,43);scene.add(solar);for(let i=0;i<3;i++){let panel=box(solar,i*2,.9,0,1.8,.12,3,mat('#23485b',.25,.35));panel.rotation.x=-.22;box(solar,i*2,.25,0,.12,.5,.12,metal)}
+// distant green landscape and subtle hills
+for(let i=0;i<70;i++){let x=(Math.random()-.5)*360,z=(Math.random()-.5)*360;if(Math.abs(x)<90&&Math.abs(z)<90)continue;if((x>-132&&x<-78&&z>-63&&z<-12)||(x>78&&x<132&&z>12&&z<63))continue;tree(x,z,.7+Math.random()*1.1)}
+// Low landscaped hedges, planted beds and parked vehicles add scale and visual richness.
+function shrub(x,z,s=1){const m=new THREE.Mesh(new THREE.IcosahedronGeometry(s,1),grass2);m.position.set(x,s*.55,z);m.scale.set(1.25,.75,.9);m.castShadow=true;m.receiveShadow=true;scene.add(m)}
+for(let x=-29;x<=29;x+=3.2){shrub(x,35,.65);shrub(x,50,.55)}for(let z=-15;z<=22;z+=3.2){shrub(-61,z,.6);shrub(59,z,.6)}
+const parkedVehicles=[];
+const carColors=['#c5c9c8','#252d32','#89969a','#e1ddd2','#526b7a','#a8b3b5','#6b777d'];function car(x,z,color,type='sedan'){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const paint=mat(color,.34,.22),trim=mat('#202629',.55,.25),windowGlass=new THREE.MeshPhysicalMaterial({color:'#42606c',roughness:.17,metalness:.24,clearcoat:.8,clearcoatRoughness:.12}),lampMat=new THREE.MeshStandardMaterial({color:'#f5e8c4',emissive:'#6d6040',emissiveIntensity:.25,roughness:.25}),tailMat=new THREE.MeshStandardMaterial({color:'#b52d25',emissive:'#5a100b',emissiveIntensity:.18});
+const isSUV=type==='suv'||type==='van', length=type==='van'?5.1:4.45,width=type==='van'?2.25:2.05;
+box(g,0,.56,0,width,.62,length,paint);box(g,0,.88,-.05,width*.9,.16,length*.78,paint);box(g,0,1.18,-.18,width*.82,isSUV?.88:.67,length*.47,paint);
+// Windshield and rear window, side glazing, pillars and beltline trim.
+box(g,0,1.25,length*.08,width*.73,.48,.07,windowGlass);box(g,0,1.23,-length*.39,width*.72,.42,.07,windowGlass);
+for(const side of [-1,1]){box(g,side*width*.44,1.22,-.12,.055,.62,length*.42,trim);box(g,side*width*.44,1.22,.03,.055,.58,.055,trim);box(g,side*width*.44,1.22,-.55,.055,.55,.055,trim);box(g,side*width*.51,.67,0,.055,.07,length*.7,trim);for(const zz of [-.48,.5]){const mirror=box(g,side*width*.57,1.12,zz,.18,.12,.22,paint);mirror.rotation.y=side*.15}box(g,side*width*.515,.87,-.25,.025,.055,.24,metal,false)}
+// Bumpers, grille, headlights, taillights and license plate.
+box(g,0,.43,length*.51,width*.84,.2,.12,trim);box(g,0,.44,-length*.51,width*.84,.2,.12,trim);box(g,0,.72,length*.507,width*.42,.2,.035,metal,false);for(const side of [-1,1]){box(g,side*width*.34,.78,length*.514,.32,.18,.055,lampMat,false);box(g,side*width*.34,.78,-length*.514,.28,.18,.055,tailMat,false);}
+// Four tires with visible rubber sidewalls, rims and hubs.
+for(const xx of [-1,1])for(const zz of [-.32,.34]){const wheel=new THREE.Group();wheel.position.set(xx*width*.49,.36,zz*length);g.add(wheel);const tire=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.18,20),rubber);tire.rotation.z=Math.PI/2;tire.castShadow=true;wheel.add(tire);const rim=new THREE.Mesh(new THREE.CylinderGeometry(.205,.205,.195,16),metal);rim.rotation.z=Math.PI/2;wheel.add(rim);const hub=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.205,12),trim);hub.rotation.z=Math.PI/2;wheel.add(hub);for(let k=0;k<5;k++){const spoke=box(wheel,xx*.105,0,0,.035,.035,.27,white,false);spoke.rotation.x=k*Math.PI/5}}
+// Roof antenna and subtle panel seams.
+if(type!=='van')box(g,0,1.66,-.45,.055,.16,.055,trim,false);box(g,0,1.56,0,width*.45,.025,length*.28,paint,false);if(window._collectParkedVehicles)parkedVehicles.push(g);return g}
+// Two proper parking zones outside the densest academic core. Each has a clear
+// entry spur, two-way aisle, marked bays, accessible spaces, landscape islands,
+// pedestrian links, lighting, signage and vehicles that stay within the stalls.
+const parkingAsphalt=new THREE.MeshStandardMaterial({color:'#373d3f',map:proceduralTexture('#373d3f','road'),roughness:.96});
+const parkingPaint=mat('#eee9d9',.82), parkingBlue=mat('#2f6f9c',.75), parkingCurb=mat('#a9a89f'), parkingSoil=mat('#5b4b3c');
+function parkingTree(x,z,s=1){tree(x,z,s)}
+function parkingLot(cx,cz,side,title){
+  const W=60,D=54, left=cx-W/2,right=cx+W/2,top=cz-D/2,bottom=cz+D/2;
+  const slab=new THREE.Mesh(new THREE.PlaneGeometry(W,D),parkingAsphalt);slab.rotation.x=-Math.PI/2;slab.position.set(cx,.018,cz);slab.receiveShadow=true;scene.add(slab);
+  // Raised perimeter curb segments
+  for(const [x,z,w,d] of [[cx,top,W,.34],[cx,bottom,W,.34],[left,cz,.34,D],[right,cz,.34,D]])box(scene,x,.12,z,w,.24,d,parkingCurb,false);
+  // A landscaped central median divides the large paved surface and shades cars.
+  for(const z of [cz-7,cz+7]){
+    // Short planting islands at the ends soften the lot without blocking drive aisles.
+    for(const x of [left+4.5,right-4.5]){
+      const island=new THREE.Mesh(new THREE.BoxGeometry(3.4,.16,1.8),parkingSoil);island.position.set(x,.11,z);island.receiveShadow=true;scene.add(island);
+      box(scene,x,.23,z,3.5,.08,1.9,parkingCurb,false);
+      for(let i=0;i<3;i++){const bush=new THREE.Mesh(new THREE.IcosahedronGeometry(.42+(i%2)*.12,1),i%2?grass2:grass);bush.position.set(x-1+i*.95,.57,z);bush.scale.set(1.1,.7,.9);bush.castShadow=true;scene.add(bush)}
+    }
+  }
+  // Three parking rows, with consistent stall width and aisle spacing.
+  const rowZ=[cz-18,cz,cz+18];
+  const startX=cx-25.2;
+  for(let r=0;r<rowZ.length;r++){
+    const z=rowZ[r];
+    for(let i=0;i<15;i++){
+      const x=startX+i*3.6;
+      // stall side lines and a short head line
+      box(scene,x-1.68,.045,z, .055,.018,5.8,parkingPaint,false);
+      box(scene,x+1.68,.045,z, .055,.018,5.8,parkingPaint,false);
+      box(scene,x,.045,z-2.88,3.35,.018,.055,parkingPaint,false);
+      // Keep a few accessible bays nearest the pedestrian exit clear and marked.
+      const accessible=(i>=12 && r===1);
+      if(accessible){
+        const bluePad=new THREE.Mesh(new THREE.PlaneGeometry(3.15,5.4),parkingBlue);bluePad.rotation.x=-Math.PI/2;bluePad.position.set(x,.052,z);scene.add(bluePad);
+        box(scene,x-1.68,.06,z,.055,.018,5.4,parkingPaint,false);box(scene,x+1.68,.06,z,.055,.018,5.4,parkingPaint,false);
+        for(let k=-2;k<=2;k++)box(scene,x+k*.36,.064,z, .045,.015,5.1,parkingPaint,false);
+        // Accessible symbol simplified as a high-contrast white icon-like marking.
+        const iconHead=new THREE.Mesh(new THREE.CircleGeometry(.19,12),white);iconHead.rotation.x=-Math.PI/2;iconHead.position.set(x,.071,z-.8);scene.add(iconHead);
+        box(scene,x,.073,z+.05,.12,.018,1.25,white,false);box(scene,x+.35,.073,z+.48,.65,.018,.12,white,false);
+      }else{
+        const type=(i%7===0?'suv':(i%11===0?'van':'sedan'));
+        // Alternate vehicle paint, but leave several spaces vacant for a believable lot.
+        if(!((i+r*2)%5===0)){window._collectParkedVehicles=true;car(x,z,carColors[(i+r*2+(side==='west'?1:3))%carColors.length],type);window._collectParkedVehicles=false;}
+      }
+    }
+  }
+  // Entry lane and directional arrows at the open ends; crosswalk ties the lot to the sidewalk.
+  const entryX=side==='west'?right:left;
+  for(let j=0;j<5;j++)box(scene,entryX+(side==='west'?-.5:.5),.055,cz-2+j*1.0,1.0,.018,.12,parkingPaint,false);
+  box(scene,side==='west'?right-3:left+3,.058,cz, .18,.02,5.8,parkingPaint,false);
+  // Walkway through the lot and tactile-style edge strip.
+  const walkX=side==='west'?right-1.2:left+1.2;
+  const walk=new THREE.Mesh(new THREE.PlaneGeometry(1.8,D-3),sidewalk);walk.rotation.x=-Math.PI/2;walk.position.set(walkX,.052,cz);scene.add(walk);
+  for(let z=top+3;z<bottom-2;z+=3.2)box(scene,walkX,.065,z,1.65,.012,.035,jointMat,false);
+  for(let k=0;k<8;k++)box(scene,walkX-0.55+k*.16,.067,cz-3, .06,.012,1.2,parkingPaint,false);
+  // Landscape buffers and realistic light poles at corners.
+  for(const [x,z] of [[left+1.8,top+1.8],[right-1.8,top+1.8],[left+1.8,bottom-1.8],[right-1.8,bottom-1.8]]){
+    parkingTree(x,z,.62);
+  }
+  for(const [x,z] of [[left+3,cz-5],[right-3,cz+5]]){
+    const pole=new THREE.Group();pole.position.set(x,0,z);scene.add(pole);const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.09,.14,6.5,10),metal);shaft.position.y=3.25;shaft.castShadow=true;pole.add(shaft);box(pole,.48,6.35,0,1.1,.12,.28,metal,false);const lampLens=new THREE.Mesh(new THREE.BoxGeometry(.48,.09,.22),new THREE.MeshStandardMaterial({color:'#fff0c5',emissive:'#ffe0a0',emissiveIntensity:.65}));lampLens.position.set(.85,6.25,0);pole.add(lampLens);
+  }
+  // Tall entrance sign with a clear zone label.
+  const signX=side==='west'?right-1.0:left+1.0;
+  const signPost=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,2.7,8),metal);signPost.position.set(signX,1.35,top+2.2);scene.add(signPost);
+  box(scene,signX,2.35,top+2.2,2.8,.9,.18,mat('#263b43'),false);
+  const signCanvas=document.createElement('canvas');signCanvas.width=512;signCanvas.height=128;const ctx=signCanvas.getContext('2d');ctx.fillStyle='#263b43';ctx.fillRect(0,0,512,128);ctx.fillStyle='#f7f3e9';ctx.font='bold 34px Arial';ctx.textAlign='center';ctx.fillText(title,256,52);ctx.font='26px Arial';ctx.fillText('P  ·  CAMPUS',256,94);const signTex=new THREE.CanvasTexture(signCanvas);const signFace=new THREE.Mesh(new THREE.PlaneGeometry(2.65,.65),new THREE.MeshBasicMaterial({map:signTex}));signFace.position.set(signX,2.35,top+2.095);scene.add(signFace);
+  // Guard/control booth beside the entry lane, with glazing, canopy, door and barrier arm.
+  const gateX=side==='west'?entryX-5:entryX+5, gateZ=cz-9;
+  const booth=new THREE.Group();booth.position.set(gateX,0,gateZ);scene.add(booth);
+  box(booth,0,1.35,0,4.2,2.7,3.4,concrete);box(booth,0,2.78,0,4.65,.22,3.85,roof);
+  for(const sx of [-1,1]){box(booth,sx*1.25,1.55,1.73,1.35,1.45,.08,glass,false);box(booth,sx*1.25,1.55,-1.73,1.35,1.45,.08,glass,false)}
+  box(booth,0,1.25,1.77,.82,2.25,.12,dark,false);box(booth,0,2.55,1.82,4.3,.12,.18,metal,false);
+  const arm=new THREE.Group();arm.position.set(side==='west'?entryX-1:entryX+1,.95,cz);scene.add(arm);const armBar=box(arm,side==='west'?3.1:-3.1,0,0,6.2,.16,.18,white,false);for(let q=0;q<6;q++)box(arm,(side==='west'?1:-1)*(0.8+q*.9),.005,0,.32,.17,.2,red,false);
+  const gateLamp=new THREE.Mesh(new THREE.SphereGeometry(.16,12,8),new THREE.MeshStandardMaterial({color:'#ffcf50',emissive:'#ff9f00',emissiveIntensity:.8}));gateLamp.position.set(0,2.95,0);booth.add(gateLamp);
+  if(!window._campusColliders)window._campusColliders=[];window._campusColliders.push({x:gateX,z:gateZ,rx:2.35,rz:2.0},{x:entryX,z:cz,rx:3.3,rz:.55});
+  // Main access spur links this lot to the perimeter campus road.
+  const connectorX=side==='west'?-80.5:80.5;
+  const lotEdge=side==='west'?right:left;
+  const connectorMid=(connectorX+lotEdge)/2, connectorLength=Math.abs(lotEdge-connectorX)+4;
+  road(connectorMid,cz,connectorLength,8);
+  for(const z of [cz-4.15,cz+4.15])box(scene,connectorMid,.04,z,connectorLength,.025,.12,parkingPaint,false);
+  // Pedestrian crossing on the connector and an illuminated approach.
+  for(let k=0;k<7;k++)box(scene,side==='west'?-80.5:80.5,.052,cz-2.5+k*.8,3.0,.018,.38,white,false);
+  const pathMesh=new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(cx-connectorX)+7,2.2),sidewalk);pathMesh.rotation.x=-Math.PI/2;pathMesh.position.set((connectorX+cx)/2,.06,cz+5.6);scene.add(pathMesh);
+}
+parkingLot(-105,-37,'west','PARKING OESTE');
+parkingLot(105,37,'east','PARKING ESTE');
+// Small bollards and planter blocks along the main approach.
+for(let z=23;z<42;z+=3.2){for(const x of [-8.5,8.5]){const b=new THREE.Mesh(new THREE.CylinderGeometry(.14,.18,.8,10),metal);b.position.set(x,.4,z);b.castShadow=true;scene.add(b)}}
+
+// Extra realism pass: curb edges, paving joints, landscaped islands, roof drains and facade-mounted exterior lights.
+for(const [x,z,w,d] of [[0,34,75,.28],[0,52,75,.28],[-38,0,.25,55],[38,0,.25,55]])box(scene,x,.08,z,w,.16,d,curbMat,false);
+for(let x=-12;x<=12;x+=3)for(let z=34;z<=51;z+=3){box(scene,x,.065,z,.035,.012,2.8,jointMat,false);box(scene,x,.065,z,2.8,.012,.035,jointMat,false)}
+// Road shoulders, drainage edges and subtle pavement lane markings.
+for(const z of [-72,72]){box(scene,0,.035,z,142,.035,.18,white,false)}
+for(const x of [-72,72]){box(scene,x,.035,0,.18,.035,142,white,false)}
+// Small pavement joints around the service court and parking approach.
+for(let x=-18;x<=18;x+=3){box(scene,x,.035,-58,.035,.018,15,jointMat,false)}
+for(let z=-64;z<=-52;z+=3){box(scene,0,.035,z,40,.018,.035,jointMat,false)}
+// Raised planters with low, varied foliage near the main entrance.
+function planter(x,z,w,d){box(scene,x,.15,z,w,.3,d,mat('#b4b0a5'),false);for(let i=0;i<Math.floor(w/1.3);i++){const bush=new THREE.Mesh(new THREE.SphereGeometry(.42,10,8),i%2?grass2:grass);bush.position.set(x-w/2+.65+i*1.3,.55,z);bush.scale.set(1,.65,.85);bush.castShadow=true;scene.add(bush)}}
+planter(-20,31,12,2.2);planter(20,31,12,2.2);planter(-29,17,2.2,10);planter(29,17,2.2,10);
+// Window sill shadows and external light fixtures add depth to building faces.
+for(const b of buildings){if(!b.obj)continue;const p=b.obj.position;for(const side of [-1,1]){const lightFixture=new THREE.Mesh(new THREE.BoxGeometry(.22,.28,.16),metal);lightFixture.position.set(p.x+side*4,3,p.z+12);lightFixture.castShadow=true;scene.add(lightFixture)}}
+// Recinto vial: aceras continuas, rampas de accesibilidad, bordillos, cruces peatonales,
+// líneas de carril, flechas, rejillas de drenaje y juntas para evitar superficies vacías.
+
+function sidewalkStrip(x,z,w,d){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),sidewalk);m.rotation.x=-Math.PI/2;m.position.set(x,.045,z);m.receiveShadow=true;scene.add(m);return m}
+// Broad sidewalks beside the perimeter roads and pedestrian connectors.
+for(const z of [-78,-72,72,78])sidewalkStrip(0,z,145,2.2);
+for(const x of [-78,-72,72,78])sidewalkStrip(x,0,2.2,145);
+for(const [x,z,w,d] of [[0,30,74,2.5],[0,55,74,2.5],[-37,4,2.5,50],[37,4,2.5,50],[0,-30,80,2.2],[-20,-47,2.2,25],[20,-47,2.2,25]])sidewalkStrip(x,z,w,d);
+// Expansion joints in the walkways and tactile warning strips at crossing points.
+for(const z of [-78,-72,72,78])for(let x=-70;x<=70;x+=4)box(scene,x,.061,z, .035,.012,1.9,jointMat,false);
+for(const x of [-78,-72,72,78])for(let z=-70;z<=70;z+=4)box(scene,x,.061,z,1.9,.012,.035,jointMat,false);
+for(const x of [-7,-5.5,-4,-2.5,-1,0.5,2,3.5,5,6.5])box(scene,x,.065,29, .72,.018,4.4,lanePaint,false);
+for(const z of [-7,-5.5,-4,-2.5,-1,0.5,2,3.5,5,6.5])box(scene,-38,.065,z,4.4,.018,.72,lanePaint,false);
+// Directional arrows and stop bars at the main internal junction.
+box(scene,0,.06,8,7,.02,.18,lanePaint,false);box(scene,0,.06,10.1,.18,.02,4.2,lanePaint,false);box(scene,-2.1,.06,8.5,.18,.02,1.7,lanePaint,false).rotation.z=-.7;box(scene,2.1,.06,8.5,.18,.02,1.7,lanePaint,false).rotation.z=.7;
+// Drain grates at low points, stormwater channels and painted parking dividers.
+for(const z of [-67,67])for(let x=-60;x<=60;x+=3){box(scene,x,.055,z,.12,.015,.75,dark,false);}
+for(const x of [-68,68])for(let z=-60;z<=60;z+=3){box(scene,x,.055,z,.75,.015,.12,dark,false);}
+for(let row=0;row<4;row++)for(let col=0;col<8;col++){const px=16+col*3.2,pz=-49+row*4;box(scene,px,.055,pz,2.65,.018,.055,lanePaint,false);box(scene,px-1.3,.055,pz-1.4,.055,.018,2.8,lanePaint,false);box(scene,px+1.3,.055,pz-1.4,.055,.018,2.8,lanePaint,false)}
+// Raised curbs around landscaped islands with clipped hedges and flowering ground cover.
+function flowerBed(x,z,sx,sz){const soil=mat('#51483b',1);const bed=new THREE.Mesh(new THREE.BoxGeometry(sx,.12,sz),soil);bed.position.set(x,.09,z);scene.add(bed);for(let i=0;i<Math.floor(sx*1.8);i++){const xx=x-sx*.46+Math.random()*sx*.92,zz=z-sz*.42+Math.random()*sz*.84;const bush=new THREE.Mesh(new THREE.SphereGeometry(.12+Math.random()*.12,8,6),[grass,grass2,mat('#8c9d63')][i%3]);bush.position.set(xx,.22,zz);bush.scale.set(1,.65,1);bush.castShadow=true;scene.add(bush)}}
+flowerBed(-20,40,9,3);flowerBed(20,40,9,3);flowerBed(-46,-6,4,8);flowerBed(47,-8,4,8);
+// Roadside short posts, reflectors and curb ramps at crossings.
+for(const z of [-70,-56,-42,-28,-14,14,28,42,56,70])for(const x of [-70,70]){const post=new THREE.Mesh(new THREE.CylinderGeometry(.09,.12,.65,10),white);post.position.set(x,.33,z);post.castShadow=true;scene.add(post);const band=new THREE.Mesh(new THREE.CylinderGeometry(.095,.095,.12,10),yellow);band.position.set(x,.42,z);scene.add(band)}
+
+
+// V5 quality pass: pedestrian amenities, access details, tropical planting variety,
+// road safety markings, service objects and additional roof / facade micro-detail.
+const benchWood=mat('#76563b',.72), benchMetal=mat('#343d40',.48,.45), signGreen=mat('#285044',.65), concreteLight=mat('#d0cec5');
+function bench(x,z,rot=0){const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;scene.add(g);for(let i=0;i<5;i++)box(g,0,.48+i*.075,0,2.15,.055,.12,benchWood,false);for(const xx of [-.82,.82]){box(g,xx,.23,0,.12,.46,.12,benchMetal,false);box(g,xx,.65,-.28,.12,.65,.12,benchMetal,false)}box(g,0,.28,0,1.8,.08,.42,benchMetal,false)}
+function trashBin(x,z){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const body=new THREE.Mesh(new THREE.CylinderGeometry(.28,.32,.82,12),mat('#465b59',.72));body.position.y=.41;body.castShadow=true;g.add(body);const lid=new THREE.Mesh(new THREE.CylinderGeometry(.33,.33,.09,12),metal);lid.position.y=.86;g.add(lid);box(g,0,.48,.29,.22,.22,.025,dark,false)}
+function bollard(x,z){const m=new THREE.Mesh(new THREE.CylinderGeometry(.11,.15,.7,12),mat('#d0d1cb',.48,.25));m.position.set(x,.35,z);m.castShadow=true;scene.add(m);const band=new THREE.Mesh(new THREE.CylinderGeometry(.115,.115,.1,12),yellow);band.position.set(x,.49,z);scene.add(band)}
+// Seating and waste bins beside the entrance plaza and near teaching wings.
+bench(-16,24,.08);bench(16,24,-.08);bench(-42,9,Math.PI/2);bench(43,7,Math.PI/2);
+for(const [x,z] of [[-18,27],[18,27],[-41,12],[42,10],[0,25]])trashBin(x,z);
+for(let z=18;z<30;z+=2.4){bollard(-10,z);bollard(10,z)}
+// A modest covered campus shuttle / bus stop, with roof supports, bench and route panel.
+const shelter=new THREE.Group();shelter.position.set(50,0,18);scene.add(shelter);
+for(const x of [-2.4,2.4])for(const z of [-1.15,1.15])box(shelter,x,1.55,z,.12,3.1,.12,metal,false);
+box(shelter,0,3.15,0,5.3,.2,2.8,roof,false);box(shelter,0,1.55,-1.1,4.8,2.35,.08,glass,false);box(shelter,0,.58,.55,3.5,.12,.48,benchWood,false);
+box(shelter,2.1,1.55,1.2,.75,1.25,.12,signGreen,false);
+// Realistic curb cuts and tactile warning pavers at major pedestrian crossings.
+for(const [x,z,rot] of [[0,29,0],[-38,0,Math.PI/2],[38,0,Math.PI/2],[-72,-37,0],[72,37,0]]){
+ const ramp=new THREE.Mesh(new THREE.BoxGeometry(2.8,.09,2.2),concreteLight);ramp.position.set(x,.055,z);ramp.rotation.y=rot;ramp.receiveShadow=true;scene.add(ramp);
+ for(let i=-4;i<=4;i++)for(let j=0;j<3;j++){const dot=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.025,8),mat('#b0a995'));dot.position.set(x+i*.22,.12,z+(j-1)*.28);scene.add(dot)}
+}
+// Painted stop lines, zebra crossings, lane arrows and speed tables on campus approaches.
+function zebra(x,z,count=8,vertical=false){for(let i=0;i<count;i++){const stripe=new THREE.Mesh(new THREE.PlaneGeometry(vertical?.48:1.25,vertical?1.25:.48),lanePaint);stripe.rotation.x=-Math.PI/2;stripe.position.set(x+(vertical?0:(i-(count-1)/2)*1.55),.075,z+(vertical?(i-(count-1)/2)*1.55:0));scene.add(stripe)}}
+zebra(0,11,8,false);zebra(-38,0,8,true);zebra(38,0,8,true);zebra(-72,-37,8,false);zebra(72,37,8,false);
+for(const [x,z] of [[0,15],[-38,6],[38,6],[-72,-31],[72,31]]){
+ box(scene,x,.06,z,7,.025,.18,lanePaint,false);
+ // Raised speed-table dark rubber blocks and reflective markers.
+ for(let k=-3;k<=3;k++){box(scene,x+k*.82,.11,z+1.2,.52,.16,.48,asphaltEdge,false);box(scene,x+k*.82,.2,z+1.2,.28,.018,.16,yellow,false)}
+}
+// Road signs on slender galvanized posts: stop, pedestrian crossing and speed limit.
+function roadSign(x,z,kind,label){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const post=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,2.4,10),metal);post.position.y=1.2;post.castShadow=true;g.add(post);box(g,0,2.12,0,.9,.62,.09,kind==='stop'?mat('#b52f2c'):signGreen,false);const c=document.createElement('canvas');c.width=256;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle=kind==='stop'?'#b52f2c':'#285044';ctx.fillRect(0,0,256,128);ctx.fillStyle='#fff';ctx.font='bold 30px Arial';ctx.textAlign='center';ctx.fillText(label,128,76);const face=new THREE.Mesh(new THREE.PlaneGeometry(.84,.42),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));face.position.set(0,2.12,.052);g.add(face)}
+roadSign(-43,3,'stop','STOP');roadSign(43,3,'stop','STOP');roadSign(-76,-40,'ped','PEATÓN');roadSign(76,40,'ped','PEATÓN');
+// Fire hydrants and service cabinets near the outer service road.
+function hydrant(x,z){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const red=mat('#c63c2e',.52);const stem=new THREE.Mesh(new THREE.CylinderGeometry(.16,.22,.75,12),red);stem.position.y=.38;g.add(stem);const cap=new THREE.Mesh(new THREE.CylinderGeometry(.19,.19,.13,12),red);cap.position.y=.81;g.add(cap);for(const side of [-1,1]){const outlet=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.22,10),red);outlet.rotation.z=Math.PI/2;outlet.position.set(side*.2,.47,0);g.add(outlet)}}
+hydrant(-65,-55);hydrant(65,55);
+// Utility boxes and air-conditioning condensers add believable service infrastructure.
+function utilityCabinet(x,z){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);box(g,0,.72,0,.9,1.44,.7,mat('#64716f',.8),false);box(g,0,.73,.36,.72,1.12,.035,metal,false);for(let i=0;i<8;i++)box(g,0,.35+i*.1,.39,.48,.025,.025,dark,false);box(g,.3,.8,.41,.035,.08,.025,yellow,false)}
+utilityCabinet(-48,23);utilityCabinet(48,-22);utilityCabinet(57,-42);
+// Rooftop photovoltaic panels, skylights and ventilation clusters across more buildings.
+for(const b of buildings){if(!b.obj)continue;const p=b.obj.position;const roofY= b.height ? b.height+.36 : 10;
+ for(let i=0;i<3;i++){const panel=new THREE.Mesh(new THREE.BoxGeometry(2.1,.08,1.15),mat('#263e4c',.32,.48));panel.position.set(p.x-4+i*2.3,roofY,p.z-2);panel.castShadow=true;scene.add(panel);for(let k=-1;k<=1;k++)box(scene,p.x-4+i*2.3+k*.58,roofY+.05,p.z-2,.025,.015,1.02,mat('#8298a1',.4,.35),false)}
+ for(let i=0;i<2;i++){const unit=new THREE.Group();unit.position.set(p.x+3+i*1.3,roofY,p.z+2);scene.add(unit);box(unit,0,.38,0,.9,.76,.8,mat('#b8bdba',.72,.18));for(let k=0;k<5;k++)box(unit,-.32+k*.16,.39,.42,.045,.48,.025,dark,false);box(unit,0,.78,0,1,.08,.9,metal,false)}
+}
+// Additional palm-like tropical trees at perimeter pockets; varied heights and crowns.
+function palm(x,z,s=1){const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.18*s,.32*s,5.2*s,10),mat('#72583e'));trunk.position.y=2.6*s;trunk.castShadow=true;g.add(trunk);for(let i=0;i<7;i++){const a=i*Math.PI*2/7;const frond=new THREE.Mesh(new THREE.ConeGeometry(.42*s,3.2*s,7),[mat('#3b693b'),mat('#4b7942'),mat('#5b8547')][i%3]);frond.position.set(Math.cos(a)*1.05*s,5.15*s,Math.sin(a)*1.05*s);frond.rotation.z=-Math.cos(a)*.72;frond.rotation.x=Math.sin(a)*.72;frond.scale.set(.65,.42,1.7);frond.castShadow=true;g.add(frond)}}
+for(const [x,z,s] of [[-61,-19,.9],[-60,21,1.1],[60,-17,1],[61,21,.92],[-92,-55,1.1],[92,54,1.15],[-91,52,.9],[91,-54,.95]])palm(x,z,s);
+// Fine asphalt patches, manhole covers and drain channels along road edges.
+function manhole(x,z){const ring=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.035,20),metal);ring.position.set(x,.055,z);scene.add(ring);const disk=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.04,20),mat('#555b59',.9));disk.position.set(x,.075,z);scene.add(disk);for(let i=0;i<6;i++){const a=i*Math.PI/3;box(scene,x+Math.cos(a)*.18,.099,z+Math.sin(a)*.18,.22,.012,.025,dark,false).rotation.y=a}}
+for(const [x,z] of [[-56,-65],[55,65],[-67,17],[67,-17],[-20,-69],[21,69]])manhole(x,z);
+// Additional fine walkway slabs and low retaining edges around landscaped courts.
+for(const [x,z,w,d] of [[-25,20,10,7],[25,20,10,7],[-48,-17,7,10],[48,-17,7,10]]){
+ for(let i=0;i<Math.floor(w/1.5);i++)for(let j=0;j<Math.floor(d/1.5);j++){const slab=new THREE.Mesh(new THREE.BoxGeometry(1.42,.055,1.42),i%2?mat('#bdbdb5'):mat('#d0cec6'));slab.position.set(x-w/2+.75+i*1.5,.065,z-d/2+.75+j*1.5);slab.receiveShadow=true;scene.add(slab)}
+}
+
+// ===== V8 · pulido final: cielo, nubes, suelo lejano, tráfico, peatones, rótulo, manga de viento, luces y modo día/noche =====
+try{(()=>{
+const T=THREE,hemi=scene.children.find(o=>o.isHemisphereLight),hemi0=hemi.intensity,sun0=sun.intensity,fill0=ambientFill.intensity;
+camera.near=.4;camera.far=1500;camera.updateProjectionMatrix();
+const col=h=>new T.Color(h),rnd=Math.random;
+// --- Cielo con degradado y disco solar ---
+const skyU={top:{value:col('#6f9fd0')},mid:{value:col('#b8c9d1')},sunDir:{value:sun.position.clone().normalize()},sunCol:{value:col('#fff2cf')}};
+const dome=new T.Mesh(new T.SphereGeometry(1200,32,16),new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,uniforms:skyU,
+ vertexShader:'varying vec3 v;void main(){v=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+ fragmentShader:'uniform vec3 top,mid,sunCol,sunDir;varying vec3 v;void main(){float h=clamp(v.y,0.,1.);vec3 c=mix(mid,top,pow(h,.55));float s=max(dot(normalize(v),sunDir),0.);c+=sunCol*(pow(s,600.)*1.6+pow(s,18.)*.18);gl_FragColor=vec4(c,1.);}'}));
+dome.renderOrder=-2;scene.add(dome);
+const far=new T.Mesh(new T.CircleGeometry(1400,48),new T.MeshBasicMaterial({color:'#7d8a66'}));far.rotation.x=-Math.PI/2;far.position.y=-.6;scene.add(far);
+// Estrellas (solo de noche)
+const sp=[];for(let i=0;i<700;i++){const a=rnd()*6.283,b=.06+rnd()*1.4;sp.push(Math.cos(a)*Math.cos(b)*1100,Math.sin(b)*1100,Math.sin(a)*Math.cos(b)*1100)}
+const sg=new T.BufferGeometry();sg.setAttribute('position',new T.Float32BufferAttribute(sp,3));
+const stars=new T.Points(sg,new T.PointsMaterial({size:2.2,sizeAttenuation:false,color:'#ffffff',transparent:true,opacity:0,depthWrite:false,fog:false}));scene.add(stars);
+// --- Nubes que avanzan despacio ---
+const ct=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d'),r=g.createRadialGradient(64,64,4,64,64,62);r.addColorStop(0,'rgba(255,255,255,.95)');r.addColorStop(.5,'rgba(255,255,255,.45)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128);return new T.CanvasTexture(c)})();
+const cmat=new T.SpriteMaterial({map:ct,transparent:true,depthWrite:false,fog:false,opacity:.9}),clouds=[];
+for(let i=0;i<16;i++){const g=new T.Group(),a=rnd()*6.283,d=350+rnd()*500;g.position.set(Math.cos(a)*d,170+rnd()*90,Math.sin(a)*d);
+ for(let k=0;k<5;k++){const s=new T.Sprite(cmat);s.position.set((rnd()-.5)*120,(rnd()-.5)*10,(rnd()-.5)*50);s.scale.set(110+rnd()*70,50+rnd()*25,1);g.add(s)}scene.add(g);clouds.push(g)}
+// --- Manchas de césped para romper la repetición del suelo ---
+const gp=['#5f7a42','#7b8f4e','#6e7f55','#58703f'];
+for(let i=0;i<90;i++){const m=new T.Mesh(new T.CircleGeometry(5+rnd()*13,20),new T.MeshStandardMaterial({color:gp[i%4],roughness:1,transparent:true,opacity:.4}));
+ m.rotation.x=-Math.PI/2;m.position.set((rnd()-.5)*400,-.2,(rnd()-.5)*400);m.receiveShadow=true;scene.add(m)}
+// --- Tráfico por el anillo vial ---
+const sdT=(()=>{const q=document.createElement('canvas');q.width=256;q.height=64;const x=q.getContext('2d');x.fillStyle='#10305e';x.fillRect(0,0,256,64);x.fillStyle='#fff';x.font='bold 40px Arial';x.textAlign='center';x.fillText('SEGURIDAD',128,46);return new T.CanvasTexture(q)})();
+function secure(c){box(c,0,1.66,-.2,1.3,.1,.34,dark,false);const r=box(c,-.4,1.76,-.2,.44,.13,.3,new T.MeshStandardMaterial({color:'#ff2020',emissive:'#ff0000',emissiveIntensity:1}),false),b=box(c,.4,1.76,-.2,.44,.13,.3,new T.MeshStandardMaterial({color:'#2060ff',emissive:'#1040ff',emissiveIntensity:1}),false);c.userData.bar=[r,b];
+ for(const s of[-1,1]){const d=new T.Mesh(new T.PlaneGeometry(2.4,.6),new T.MeshStandardMaterial({map:sdT}));d.position.set(s*1.04,.95,0);d.rotation.y=s*Math.PI/2;c.add(d)}}
+const cars=[];
+for(let i=0;i<3;i++){const dir=1,R=145,c=car(0,0,'#f2f4f5',i===1?'suv':'sedan');secure(c);cars.push({c,s:i*165,R,dir,sp:4.4,h:0})}
+function loopPos(s,R){const L=2*R;s=((s%(8*R))+8*R)%(8*R);const k=Math.floor(s/L),u=s-k*L-R;return k===0?[u,-R,1,0]:k===1?[R,u,0,1]:k===2?[-u,R,-1,0]:[-R,-u,0,-1]}
+// --- Peatones caminando por las aceras ---
+const skin=['#e0b48f','#c68e6a','#8d5a3b','#f0c8a4'],cloth=['#2f4f7f','#9c3b3b','#3f7d5a','#d9d3c3','#5b4b8a','#2a2a2a'];
+const gT=(()=>{const q=document.createElement('canvas');q.width=256;q.height=64;const x=q.getContext('2d');x.fillStyle='rgba(16,48,94,.9)';x.fillRect(0,0,256,64);x.fillStyle='#ffd23a';x.font='bold 38px Arial';x.textAlign='center';x.fillText('SEGURIDAD',128,45);return new T.CanvasTexture(q)})();
+function person(){const g=new T.Group(),m=c=>new T.MeshStandardMaterial({color:c,roughness:.8}),limb=(r,l,x,y,c)=>{const p=new T.Mesh(new T.CylinderGeometry(r,r*.85,l,8),m(c));p.geometry.translate(0,-l/2,0);p.position.set(x,y,0);g.add(p);return p};
+ const body=new T.Mesh(new T.CylinderGeometry(.2,.24,.7,10),m('#16264a'));body.position.y=1.15;const head=new T.Mesh(new T.SphereGeometry(.14,12,10),m(skin[rnd()*4|0]));head.position.y=1.68;const vest=new T.Mesh(new T.CylinderGeometry(.215,.255,.3,10),m('#e8d21f'));vest.position.y=1.2;const cap=new T.Mesh(new T.CylinderGeometry(.15,.16,.09,12),m('#0e1a33'));cap.position.y=1.82;const lb=new T.Sprite(new T.SpriteMaterial({map:gT,transparent:true}));lb.scale.set(1.5,.38,1);lb.position.y=2.3;g.add(body,head,vest,cap,lb);
+ g.userData.l=[limb(.075,.8,-.1,.8,'#2d3440'),limb(.075,.8,.1,.8,'#2d3440'),limb(.055,.6,-.27,1.45,'#16264a'),limb(.055,.6,.27,1.45,'#16264a')];
+ g.traverse(o=>{if(o.isMesh)o.castShadow=true});scene.add(g);return g}
+const routes=[[75,-60,75,60],[-75,60,-75,-60],[-55,-75,55,-75],[55,75,-55,75],[-4,29,4,29],[-82.2,-55,-82.2,-20]];
+const walkers=[];routes.forEach(r=>{for(let k=0;k<1;k++)walkers.push({g:person(),r,t:rnd(),sp:.9+rnd()*.5,len:Math.hypot(r[2]-r[0],r[3]-r[1])})});
+// --- Rótulo del instituto junto al acceso ---
+const sc=document.createElement('canvas');sc.width=1024;sc.height=256;{const q=sc.getContext('2d');q.fillStyle='#2b3a3f';q.fillRect(0,0,1024,256);q.strokeStyle='#d9d3c3';q.lineWidth=6;q.strokeRect(12,12,1000,232);q.fillStyle='#f4efe2';q.textAlign='center';q.font='bold 76px Arial';q.fillText('INSTITUTE OF TECHNOLOGY',512,115);q.font='bold 64px Arial';q.fillText('AND RESEARCH CENTER',512,200)}
+const sign=new T.Group();sign.position.set(-16,0,62);sign.rotation.y=.2;scene.add(sign);
+box(sign,0,0,0,7.2,.7,1.1,concrete);box(sign,0,.7,0,7,1.8,.5,concrete);
+const sf=new T.Mesh(new T.PlaneGeometry(6.4,1.6),new T.MeshStandardMaterial({map:new T.CanvasTexture(sc),roughness:.6}));sf.position.set(0,1.6,.27);sign.add(sf);
+// --- Manga de viento y luces del helipuerto ---
+const wsk=new T.Group();wsk.position.set(34,padY,-26);scene.add(wsk);box(wsk,0,0,0,.1,4,.1,metal);
+const sock=new T.Group();sock.position.y=3.9;wsk.add(sock);const cone=new T.Mesh(new T.ConeGeometry(.45,2.2,14,1,true),new T.MeshStandardMaterial({color:'#e8662a',side:T.DoubleSide,roughness:.7}));cone.rotation.z=-Math.PI/2;cone.position.x=1.1;sock.add(cone);
+const hlM=new T.MeshStandardMaterial({color:'#ffd23a',emissive:'#ffb400',emissiveIntensity:.3});
+for(let i=0;i<36;i++){const a=i/36*6.283,l=new T.Mesh(new T.SphereGeometry(.14,8,6),hlM);l.position.set(padX+Math.cos(a)*15.15,padY+.1,padZ+Math.sin(a)*15.15);scene.add(l)}
+// --- Balizas rojas de antena y torre ---
+const bm=new T.MeshStandardMaterial({color:'#ff2a2a',emissive:'#ff0000',emissiveIntensity:.5});
+[[78,37.8,-30],[8,25.3,-27]].forEach(p=>{const b=new T.Mesh(new T.SphereGeometry(.4,10,8),bm);b.position.set(...p);scene.add(b)});
+// --- Focos de la fachada principal (solo de noche) ---
+const up=[[-7,1,35],[7,1,35],[-16,1,28],[16,1,28]].map(p=>{const l=new T.PointLight(0xffd9a0,0,24,2);l.position.set(...p);scene.add(l);return l});
+const lamps=[];scene.traverse(o=>{if(o.isPointLight&&!up.includes(o))lamps.push([o,o.intensity])});
+// --- Modo día / noche con transición suave ---
+const btn=document.createElement('button');btn.className='secondary';btn.textContent='Modo día / noche';const cp=document.querySelector('#controls');cp.insertBefore(btn,cp.querySelector('p'));
+let target=0,k=0;btn.onclick=()=>{target=target?0:1};
+const D={top:col('#6f9fd0'),mid:col('#b8c9d1'),sun:col('#fff0d8'),hemi:col('#eaf5ff'),far:col('#7d8a66'),cl:col('#ffffff')},N={top:col('#050b1a'),mid:col('#1a2438'),sun:col('#8fa6d8'),hemi:col('#6f86b8'),far:col('#1c2418'),cl:col('#4a5370')};
+const wm=typeof windowMat!=='undefined'?windowMat:null,hemiC0=hemi.color.clone();
+function mood(k){skyU.top.value.copy(D.top).lerp(N.top,k);skyU.mid.value.copy(D.mid).lerp(N.mid,k);skyU.sunCol.value.setScalar(1-k*.75);
+ scene.background.copy(skyU.mid.value);scene.fog.color.copy(skyU.mid.value);far.material.color.copy(D.far).lerp(N.far,k);
+ sun.color.copy(D.sun).lerp(N.sun,k);sun.intensity=sun0*(1-k)+.14*k;hemi.color.copy(hemiC0).lerp(N.hemi,k);hemi.intensity=hemi0*(1-k)+.5*k;ambientFill.intensity=fill0*(1-k)+.18*k;
+ if(wm&&wm.emissive){wm.emissive.set('#ffd88a');wm.emissiveIntensity=k*1.1}
+ stars.material.opacity=k;cmat.color.copy(D.cl).lerp(N.cl,k);cmat.opacity=.9-.4*k;
+ up.forEach(l=>l.intensity=k*1.7);lamps.forEach(([l,b])=>l.intensity=b*(1+k*7));hlM.emissiveIntensity=.3+k*2.4;}
+// --- Bucle propio (no toca el de la escena) ---
+let last=performance.now(),tt=0;
+(function extras(now){requestAnimationFrame(extras);const dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+ dome.position.copy(camera.position);stars.position.copy(camera.position);far.position.set(camera.position.x,-.6,camera.position.z);
+ clouds.forEach(g=>{g.position.x+=dt*2.2;if(g.position.x>900)g.position.x=-900});
+ cars.forEach((o,i)=>{const bl=o.c.userData.bar;if(bl){const f=Math.sin(tt*10)>0;bl[0].material.emissiveIntensity=f?1.6:.1;bl[1].material.emissiveIntensity=f?.1:1.6}o.s+=dt*o.sp*o.dir;const p=loopPos(o.s,o.R),hx=p[2]*o.dir,hz=p[3]*o.dir,ta=Math.atan2(hx,hz);let da=ta-o.h;da=Math.atan2(Math.sin(da),Math.cos(da));o.h+=da*Math.min(1,dt*6);o.c.position.set(p[0],0,p[1]);o.c.rotation.y=o.h});
+ fountainMoving.forEach((d,i)=>{d.o.position.y=d.base+Math.sin(tt*3.2+i)*.24;d.o.position.x=Math.cos(d.a+tt*.7)*1.25;d.o.position.z=45+Math.sin(d.a+tt*.7)*1.25});
+ walkers.forEach(w=>{w.t+=dt*w.sp/w.len;const u=w.t%2,f=u<1?u:2-u,r=w.r;w.g.position.set(r[0]+(r[2]-r[0])*f,0,r[1]+(r[3]-r[1])*f);
+  const sg=u<1?1:-1;w.g.rotation.y=Math.atan2((r[2]-r[0])*sg,(r[3]-r[1])*sg);const s=Math.sin(tt*6+w.len)*.5,l=w.g.userData.l;l[0].rotation.x=s;l[1].rotation.x=-s;l[2].rotation.x=-s*.8;l[3].rotation.x=s*.8});
+ sock.rotation.y=Math.sin(tt*.6)*.5;cone.rotation.y=Math.sin(tt*2.2)*.12;
+ bm.emissiveIntensity=.3+.9*(Math.sin(tt*3)>0?1:0);
+ if(Math.abs(target-k)>.001){k+=(target-k)*Math.min(1,dt*2.2);mood(k)}
+})(performance.now());
+})()}catch(e){console.warn('V8 pulido:',e)}
+
+// ===== V9 · interiores con salones, puertas de entrada/salida, escaleras y colisiones =====
+try{(()=>{
+const T=THREE,R=.55,W=[],INT=[],S={dk:[],ch:[],lg:[]};
+const M={fl:mat('#bdb9ac',.85),wl:mat('#ebe8df',.9),dr:mat('#17252c',.4,.3),gl:new T.MeshPhysicalMaterial({color:'#a9d0dc',transparent:true,opacity:.3,roughness:.1}),bd:mat('#f6f8f7',.5),tc:mat('#8b6b49',.7),
+ ex:new T.MeshStandardMaterial({color:'#1aa34a',emissive:'#10d060',emissiveIntensity:.8}),led:new T.MeshStandardMaterial({color:'#fff',emissive:'#fff6df',emissiveIntensity:.6})};
+// caja entre límites (coordenadas del mundo); si es sólida, bloquea al caminar
+const bx=(x0,x1,y0,y1,z0,z1,m=M.wl,solid=true,cast=true)=>{if(x1-x0<.05||z1-z0<.05||y1-y0<.02)return;const o=new T.Mesh(new T.BoxGeometry(x1-x0,y1-y0,z1-z0),m);
+ o.position.set((x0+x1)/2,(y0+y1)/2,(z0+z1)/2);o.castShadow=cast;o.receiveShadow=true;o.userData.v9=1;scene.add(o);if(solid)W.push({x0,x1,z0,z1,y0,y1});return o};
+const SP=[
+ {n:'AULAS Y LABORATORIOS',F:2},
+ {n:'AULAS · A Y B',F:3},
+ {n:'ADMINISTRACIÓN',F:3,fx:10,bx:10,ex:[[7,41,16,32]]},
+ {n:'EDIFICIO CENTRAL · H',F:3,lobby:1,cx:-6.8,ex:[[-41,-7,16.5,32],[7,41,16.5,32]]}];
+const bb=new T.Box3(),sz=new T.Vector3();
+function build(sp){
+ const g=buildings.find(b=>b.name===sp.n).obj,P=g.children[0].geometry.parameters,w=P.width,h=P.height,d=P.depth,gx=g.position.x,gz=g.position.z,F=sp.F,top=h+.1,fh=(top-.2)/F,t=.25,dw=1.7;
+ const X0=gx-w/2,X1=gx+w/2,Z0=gz-d/2,Z1=gz+d/2,fx=gx+(sp.fx||0),bxx=gx+(sp.bx||0),Y=k=>.2+k*fh;
+ g.children[0].visible=false;                       // se quita la masa sólida
+ // se quitan los adornos que taparían las puertas
+ const vols=[[fx,Z1-.5,Z1+1.2],[bxx,Z0-1.2,Z0+.5]].map(([x,a,b])=>new T.Box3(new T.Vector3(x-1.9,.35,a),new T.Vector3(x+1.9,2.9,b)));
+ scene.traverse(o=>{if(!o.isMesh||!o.visible||o.userData.v9)return;bb.setFromObject(o);bb.getSize(sz);if(sz.x>12||sz.z>12||sz.y>10)return;if(vols.some(v=>v.intersectsBox(bb)))o.visible=false});
+ if(sp.lobby)lobbyLink.children.forEach((o,i)=>{bb.setFromObject(o);bb.getSize(sz);if(i===0||sz.x>13)o.visible=false});
+ // muros exteriores con hueco de puerta al frente y atrás
+ const wallZ=(z0,z1,gap)=>{bx(X0,gap-dw,0,top,z0,z1,concrete);bx(gap+dw,X1,0,top,z0,z1,concrete);bx(gap-dw,gap+dw,2.7,top,z0,z1,concrete)};
+ wallZ(Z1-t,Z1,fx);wallZ(Z0,Z0+t,bxx);bx(X0,X0+t,0,top,Z0,Z1,concrete);bx(X1-t,X1,0,top,Z0,Z1,concrete);
+ // puertas: marco, hojas de vidrio entreabiertas y letrero de salida
+ [[fx,Z1,1,Z1-t-.05],[bxx,Z0,-1,Z0+t+.05]].forEach(([x,z,s,zi])=>{
+  bx(x-dw,x-dw+.12,0,2.7,z-.15,z+.15,M.dr,false);bx(x+dw-.12,x+dw,0,2.7,z-.15,z+.15,M.dr,false);bx(x-dw,x+dw,2.62,2.7,z-.15,z+.15,M.dr,false);
+  for(const k of[-1,1]){const l=new T.Mesh(new T.BoxGeometry(1.5,2.5,.05),M.gl);l.geometry.translate(-k*.75,1.25,0);l.position.set(x+k*(dw-.12),0,z);l.rotation.y=k*s*1.15;l.userData.v9=1;scene.add(l)}
+  bx(x-.5,x+.5,2.9,3.2,zi-.04,zi+.04,M.ex,false,false)});
+ // pisos, huecos de escalera y escaleras
+ const hx0=sp.cx!==undefined?gx+sp.cx:X0+t,hx1=hx0+1.9,hz0=Z0+t+1.2,hz1=hz0+5.4,I={x0:X0+t,x1:X1-t,z0:Z0+t,z1:Z1-t,F,fh,h:[hx0,hx1,hz0,hz1]};INT.push(I);
+ bx(I.x0,I.x1,0,.2,I.z0,I.z1,M.fl,false,false);
+ for(let k=1;k<F;k++){const y1=Y(k),y0=y1-.25;[[I.x0,hx0,I.z0,I.z1],[hx1,I.x1,I.z0,I.z1],[hx0,hx1,I.z0,hz0],[hx0,hx1,hz1,I.z1]].forEach(r=>bx(r[0],r[1],y0,y1,r[2],r[3],M.fl,false,false))}
+ for(let j=0;j<F-1;j++){const n=Math.ceil(fh/.19),dz=5.4/n,dh=fh/n;
+  for(let s=0;s<n;s++){const y=Y(j)+(s+1)*dh;bx(hx0,hx1,y-.1,y,hz0+s*dz,hz0+(s+1)*dz,M.fl,false,false)}
+  const L=Math.hypot(5.4,fh);for(const x of[hx0,hx1-.1]){const m=bx(x,x+.1,-.15,.15,-L/2,L/2,M.dr,false,false);m.position.set(x+.05,Y(j)+fh/2-.1,hz0+2.7);m.rotation.x=-Math.atan2(fh,5.4)}}
+ // salones: dos filas a los lados de un pasillo central
+ const zc=gz;
+ for(let k=0;k<F;k++){if(k===0&&sp.lobby)continue;const base=Y(k),ce=Y(k+1)-.25;
+  for(const s of[1,-1]){const za=s>0?zc+1.2:I.z0,zb=s>0?I.z1:zc-1.2,zBoard=s>0?zb:za,zCorr=s>0?za:zb,dx=s>0?fx:bxx;
+   const blocked=[[dx-2.6,dx+2.6]];if(s<0)blocked.push([hx0-.2,hx1+2.5]);blocked.sort((p,q)=>p[0]-q[0]);
+   let a=I.x0;const segs=[];for(const[b0,b1]of blocked){if(b0-a>3.5)segs.push([a,b0]);a=Math.max(a,b1)}if(I.x1-a>3.5)segs.push([a,I.x1]);
+   for(const[sa,sb]of segs){const n=Math.max(1,Math.round((sb-sa)/7)),rw=(sb-sa)/n;
+    for(let i=0;i<n;i++){const x0=sa+i*rw,x1=x0+rw,xm=(x0+x1)/2;
+     if((sp.ex||[]).some(e=>x1>e[0]&&x0<e[1]&&zb>e[2]&&za<e[3]))continue;
+     if(i===0)bx(x0-.075,x0+.075,base,ce,za,zb);bx(x1-.075,x1+.075,base,ce,za,zb);
+     bx(x0,xm-.8,base,ce,zCorr-.075,zCorr+.075);bx(xm+.8,x1,base,ce,zCorr-.075,zCorr+.075);bx(xm-.8,xm+.8,base+2.5,ce,zCorr-.075,zCorr+.075,M.wl,false);
+     const zw=zBoard-s*.1;bx(xm-1.6,xm+1.6,base+.9,base+2.1,zw-.02,zw+.02,M.bd,false,false);bx(xm-.7,xm+.7,base,base+.75,zBoard-s*1.7,zBoard-s*1.1,M.tc,false);
+     const dep=Math.abs(zBoard-zCorr),cols=Math.floor((rw-1.6)/1.5),rows=Math.floor((dep-3.2)/1.4);
+     for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const px=xm+(c-(cols-1)/2)*1.5,pz=zBoard-s*(2.6+r*1.4);S.dk.push([px,base+.72,pz]);S.ch.push([px,base,pz-s*.62,s])}
+     S.lg.push([xm-1.5,ce-.03,(za+zb)/2],[xm+1.5,ce-.03,(za+zb)/2]);
+    }}}}
+ if(sp.lobby){bx(gx-2.5,gx+2.5,.2,1.2,gz+2,gz+2.8,M.tc);bx(gx-2.5,gx+2.5,1.2,1.3,gz+1.9,gz+2.9,M.dr,false)}   // recepción
+}
+SP.forEach(build);
+// muebles instanciados (pupitres, sillas y luminarias)
+const o3=new T.Object3D();
+function inst(geo,m,list,f){if(!list.length)return;const im=new T.InstancedMesh(geo,m,list.length);list.forEach((p,i)=>{o3.position.set(...f(p));o3.updateMatrix();im.setMatrixAt(i,o3.matrix)});im.castShadow=true;im.receiveShadow=true;scene.add(im)}
+inst(new T.BoxGeometry(1.1,.05,.55),M.tc,S.dk,p=>[p[0],p[1],p[2]]);
+inst(new T.BoxGeometry(.05,.7,.5),M.dr,S.dk,p=>[p[0]-.5,p[1]-.37,p[2]]);inst(new T.BoxGeometry(.05,.7,.5),M.dr,S.dk,p=>[p[0]+.5,p[1]-.37,p[2]]);
+inst(new T.BoxGeometry(.42,.05,.42),M.dr,S.ch,p=>[p[0],p[1]+.45,p[2]]);inst(new T.BoxGeometry(.42,.42,.05),M.dr,S.ch,p=>[p[0],p[1]+.7,p[2]-p[3]*.2]);
+
+inst(new T.BoxGeometry(1.2,.04,.6),M.led,S.lg,p=>p);
+// Equipamiento tecnológico distribuido en los salones y laboratorios.
+const monitorMat=mat('#18262d',.32,.22), screenMat=new T.MeshStandardMaterial({color:'#2a8ca8',emissive:'#14566b',emissiveIntensity:.42,roughness:.25});
+const keyMat=mat('#343b40',.55,.12), rackMat=mat('#303a40',.58,.38), ledBlue=new T.MeshStandardMaterial({color:'#36c8e8',emissive:'#1689b0',emissiveIntensity:1.1});
+const monitors=[],keyboards=[],rackPositions=[];
+S.dk.forEach((p,i)=>{
+  if(i%2===0)monitors.push([p[0],p[1]+.42,p[2]-.17]);
+  if(i%2===0)keyboards.push([p[0],p[1]+.055,p[2]+.12]);
+  if(i%13===0)rackPositions.push([p[0]+1.05,p[1]-.65,p[2]-1.1]);
+});
+inst(new T.BoxGeometry(.72,.46,.075),monitorMat,monitors,p=>[p[0],p[1],p[2]]);
+inst(new T.BoxGeometry(.61,.31,.025),screenMat,monitors,p=>[p[0],p[1]+.01,p[2]-.047]);
+inst(new T.BoxGeometry(.11,.18,.11),metal,monitors,p=>[p[0],p[1]-.29,p[2]]);
+inst(new T.BoxGeometry(.48,.035,.22),keyMat,keyboards,p=>p);
+inst(new T.BoxGeometry(.42,.018,.13),metal,keyboards,p=>p);
+// Gabinetes de red compactos en los laboratorios tecnológicos.
+inst(new T.BoxGeometry(.55,1.65,.62),rackMat,rackPositions,p=>p);
+inst(new T.BoxGeometry(.34,.035,.025),ledBlue,rackPositions,p=>[p[0],p[1]+.42,p[2]-.325]);
+inst(new T.BoxGeometry(.34,.035,.025),ledBlue,rackPositions,p=>[p[0],p[1]+.12,p[2]-.325]);
+
+
+// Barandillas y pasamanos en los huecos de escalera para hacer legible la circulación vertical.
+for(const I of INT){
+  const [a,b,c,e]=I.h;
+  for(let k=0;k<I.F-1;k++){
+    const yy=.2+k*I.fh;
+    for(const x of [a-.16,b+.16]){
+      bx(x-.045,x+.045,yy,yy+1.05,c+.12,e-.12,M.dr,false,false);
+      for(let z=c+.25;z<e-.1;z+=.72)bx(x-.035,x+.035,yy,yy+.88,z-.035,z+.035,metal,false,false);
+    }
+  }
+}
+// Pantallas de presentación y paneles de control en los salones.
+for(const [x,y,z] of S.lg){
+  const panel=new T.Mesh(new T.BoxGeometry(1.05,.58,.055),monitorMat);
+  panel.position.set(x,y-.55,z-.32);panel.castShadow=true;scene.add(panel);
+  const glow=new T.Mesh(new T.BoxGeometry(.91,.43,.018),screenMat);
+  glow.position.set(x,y-.55,z-.355);scene.add(glow);
+}
+
+// edificios sin interior y torre: sólidos (no se atraviesan)
+buildings.forEach(b=>{if(!b.obj||!b.obj.isGroup||SP.some(s=>s.n===b.name))return;const p=b.obj.children[0].geometry.parameters;if(!p)return;const q=b.obj.position;W.push({x0:q.x-p.width/2,x1:q.x+p.width/2,z0:q.z-p.depth/2,z1:q.z+p.depth/2,y0:-1,y1:99})});
+W.push({x0:6,x1:12,z0:-30,z1:-24,y0:-1,y1:99});
+// Collision volumes for all visible parking cars, guard booths, gate arms and the central fountain.
+for(const v of parkedVehicles){const b=new THREE.Box3().setFromObject(v);W.push({x0:b.min.x-.25,x1:b.max.x+.25,z0:b.min.z-.25,z1:b.max.z+.25,y0:0,y1:2.2})}
+for(const c of (window._campusColliders||[]))W.push({x0:c.x-c.rx,x1:c.x+c.rx,z0:c.z-c.rz,z1:c.z+c.rz,y0:0,y1:4});
+W.push({x0:-4.7,x1:4.7,z0:40.3,z1:49.7,y0:0,y1:3.2});
+// Tree trunks and larger landscape fixtures are solid while their foliage remains passable.
+for(const [x,z,r] of [[-15,39,.65],[-11,53,.55],[14,39,.65],[18,52,.55],[-34,48,.7],[34,48,.7],[-42,29,.6],[43,29,.6],[-61,-19,.6],[-60,21,.7],[60,-17,.65],[61,21,.6],[-92,-55,.7],[92,54,.7],[-91,52,.6],[91,-54,.6]])W.push({x0:x-r,x1:x+r,z0:z-r,z1:z+r,y0:0,y1:5.5});
+// física al caminar: paredes con deslizamiento y altura de piso (escaleras y niveles)
+const hit=(x,z,y)=>W.some(w=>y>=w.y0&&y<=w.y1&&x>w.x0-R&&x<w.x1+R&&z>w.z0-R&&z<w.z1+R);
+function floorY(x,z,cur){for(const I of INT){if(x<I.x0||x>I.x1||z<I.z0||z>I.z1)continue;const[a,b,c,e]=I.h,inH=x>a&&x<b&&z>c&&z<e,cs=[.2];
+  if(!inH)for(let k=1;k<I.F;k++)cs.push(.2+k*I.fh);else for(let j=0;j<I.F-1;j++)cs.push(.2+j*I.fh+I.fh*(z-c)/(e-c));
+  let best=-9;cs.forEach(v=>{if(v<=cur+.5&&v>best)best=v});return best<0?cur:best}return .1}
+window.v8Walk=p=>{const c=camera.position;const nx=c.x,nz=c.z;if(hit(nx,nz,p.y)){c.x=p.x;c.z=p.z;if(hit(c.x,c.z,p.y)){c.x=p.x;if(hit(c.x,c.z,p.y))c.x=nx;c.z=p.z;if(hit(c.x,c.z,p.y))c.z=nz}}
+ const f=floorY(c.x,c.z,p.y-1.7);c.y=p.y+(f+1.7-p.y)*.35};
+})()}catch(e){console.warn('V9 interiores:',e)}
+
+// pointer selection
+const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();renderer.domElement.addEventListener('pointerdown',e=>{if(walking)return;mouse.x=e.clientX/innerWidth*2-1;mouse.y=-(e.clientY/innerHeight)*2+1;raycaster.setFromCamera(mouse,camera);let hits=raycaster.intersectObjects(buildings.flatMap(b=>b.obj.children.length?[b.obj,...b.obj.children]:[b.obj]),true);if(hits.length){let hit=hits[0].object;let b=buildings.find(v=>v.obj===hit||v.obj.children.includes(hit)||v.obj.children.some(c=>c===hit.parent));if(!b){let p=hits[0].object;for(let k=0;k<3&&!b;k++,p=p.parent)b=buildings.find(v=>v.obj===p)}if(b){document.querySelector('#infoTitle').textContent=b.name;document.querySelector('#infoText').textContent=b.desc;document.querySelector('#info').style.display='block'}}});
+let walking=false,labels=true,yaw=0,pitch=0,keys={};const walkCam={pos:new THREE.Vector3(0,2,64),speed:0.52,boost:0.72};function enterWalk(){walking=true;orbit.enabled=false;camera.position.copy(walkCam.pos);yaw=0;pitch=0;camera.rotation.order='YXZ';camera.rotation.set(pitch,yaw,0);document.querySelector('#crosshair').style.display='block';document.querySelector('#hint').textContent='Modo caminar: WASD/flechas para moverte · Shift para acelerar · ratón para mirar · Esc para volver a la órbita';document.querySelector('#walk').textContent='Salir del modo caminar'}function exitWalk(){walking=false;orbit.enabled=true;document.querySelector('#crosshair').style.display='none';document.querySelector('#hint').textContent='Arrastra para inspeccionar el recinto · rueda para acercar · pulsa un edificio para identificarlo';document.querySelector('#walk').textContent='Caminar por el campus';document.exitPointerLock?.()}
+document.querySelector('#walk').onclick=()=>{if(walking)exitWalk();else{enterWalk();renderer.domElement.requestPointerLock?.()}};document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==renderer.domElement&&walking)exitWalk()});document.addEventListener('mousemove',e=>{if(walking&&document.pointerLockElement===renderer.domElement){yaw-=e.movementX*.002;pitch-=e.movementY*.002;pitch=Math.max(-1.35,Math.min(1.35,pitch));camera.rotation.set(pitch,yaw,0)}});document.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.key==='Escape'&&walking)exitWalk()});document.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+document.querySelector('#orbit').onclick=()=>{if(walking)exitWalk();camera.position.set(118,122,145);orbit.target.set(0,6,-8);orbit.update()};document.querySelector('#reset').onclick=()=>{exitWalk();camera.position.set(118,122,145);orbit.target.set(0,6,-8);orbit.update();document.querySelector('#info').style.display='none'};document.querySelector('#labels').onclick=()=>{labels=!labels;buildings.forEach(b=>b.label.visible=labels)};
+function animate(){requestAnimationFrame(animate);if(walking){const forward=new THREE.Vector3(-Math.sin(yaw),0,-Math.cos(yaw)),right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));let v=new THREE.Vector3();if(keys.w||keys.arrowup)v.add(forward);if(keys.s||keys.arrowdown)v.sub(forward);if(keys.d||keys.arrowright)v.add(right);if(keys.a||keys.arrowleft)v.sub(right);if(v.lengthSq())v.normalize().multiplyScalar(keys.shift?walkCam.boost:walkCam.speed);const _p=camera.position.clone();camera.position.add(v);if(window.v8Walk)window.v8Walk(_p);else camera.position.y=2;camera.position.x=THREE.MathUtils.clamp(camera.position.x,-135,135);camera.position.z=THREE.MathUtils.clamp(camera.position.z,-135,135)}else orbit.update();rotor.rotation.y+=.025;renderer.render(scene,camera)}
+window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});loading.style.display='none';animate();
+</script></body></html>
