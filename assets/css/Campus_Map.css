@@ -225,37 +225,36 @@ footer {
 		gap: 14px;
 	}
 
-	@media (max-width: 850px) {
-		.map-wrapper {
-			height: 480px;
-		}
-
-		.nav-links {
-			width: 100%;
-			justify-content: center;
-		}
-
-		main {
-			padding: 20px 20px 40px;
-		}
-
-		footer {
-			padding: 24px 20px;
-			flex-direction: column;
-			gap: 12px;
-			align-items: center;
-			text-align: center;
-		}
+	.map-wrapper {
+		height: 480px;
 	}
 
-	@media (max-width: 480px) {
-		.btn-nav-rounded {
-			min-height: 38px;
-			padding: 8px 14px;
-			font-size: 13px;
-		}
-
-		.btn-nav-rounded span {
-			display: none;
-		}
+	.nav-links {
+		width: 100%;
+		justify-content: center;
 	}
+
+	main {
+		padding: 20px 20px 40px;
+	}
+
+	footer {
+		padding: 24px 20px;
+		flex-direction: column;
+		gap: 12px;
+		align-items: center;
+		text-align: center;
+	}
+}
+
+@media (max-width: 480px) {
+	.btn-nav-rounded {
+		min-height: 38px;
+		padding: 8px 14px;
+		font-size: 13px;
+	}
+
+	.btn-nav-rounded span {
+		display: none;
+	}
+}
