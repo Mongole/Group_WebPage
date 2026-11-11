@@ -8,9 +8,11 @@
     content="SC-TECH de Puerto Rico. Educación, innovación y nuevas posibilidades para tu futuro.">
   <title>SC-TECH de Puerto Rico</title>
   <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/home.css">
   <script src="assets/js/navbar.js" defer></script>
   <script src="assets/js/page-entry.js" defer></script>
   <script src="assets/js/accessibility.js" defer></script>
+  <script src="assets/js/slideshow.js" defer></script>
 </head>
 
 <body>
@@ -34,38 +36,35 @@
     </div>
   </div>
   <header class="header">
+    <a class="skip-link" href="#main-content">Ir al contenido</a>
     <nav class="header-nav" aria-label="Navegación principal">
       <!-- Integrated Brand / Logo -->
       <a class="brand" href="index.html">
         <span class="brand-icon">
-          <img src="assets/images/SC-Tech_Logo.png" alt="College Logo" width="40">
+          <img src="assets/images/SC-Tech_Logo.png" alt="" width="40" height="41">
         </span>
-        <div style="color: #494fdb">SC-TECH<span>DE PUERTO RICO</span></div>
+        <div class="brand-name">SC-TECH<span>DE PUERTO RICO</span></div>
       </a>
 
       <!-- Barra de navegación -->
       <div class="nav-links">
-        <a class="btn-nav-rounded active" href="index.html" aria-current="page">Inicio<span
-            aria-hidden="true">↗</span></a>
+        <a class="btn-nav-rounded active" href="index.html" aria-current="page">Inicio<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
         <a class="btn-nav-rounded" href="pages/ofertas-academicas.html">
-          Ofertas académicas <span aria-hidden="true">↗</span>
+          Ofertas académicas <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
         </a>
         <a class="btn-nav-rounded" href="pages/Campus_Map.html">
-          Campus Map <span aria-hidden="true">↗</span>
+          Campus Map <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
         </a>
         <a class="btn-nav-rounded" href="pages/about-us.html">
-          About us <span aria-hidden="true">↗</span>
+          About us <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
         </a>
 
         <!-- Contenedor para botón de accesibilidad -->
         <div class="a11y-dropdown">
-          <button class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad" aria-expanded="false">
-            <!-- Squircle Icon with 3 Dashes -->
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round">
-              <line x1="4" y1="6" x2="20" y2="6" />
-              <line x1="4" y1="12" x2="20" y2="12" />
-              <line x1="4" y1="18" x2="20" y2="18" />
+          <button type="button" class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad" aria-expanded="false" aria-controls="a11yMenu">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="4" r="2" />
+              <path d="M12 8v7M5 9l7 2 7-2M12 15l-4 6M12 15l4 6" />
             </svg>
           </button>
 
@@ -85,56 +84,78 @@
     </nav>
   </header>
 
-  <main>
+  <main id="main-content" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
       <div class="hero-text">
-        <p class="eyebrow"><span></span> TU PRÓXIMO CAPÍTULO COMIENZA AQUÍ</p>
         <h1 id="hero-title">El futuro tiene<br>tu <em>nombre.</em></h1>
         <p class="intro">Transforma tu curiosidad en conocimiento y tus ideas en oportunidades. Encuentra tu camino en
           SCTECH de Puerto Rico.</p>
-        <div class="hero-actions">
-          <a class="btn-nav-rounded btn-primary" href="pages/ofertas-academicas.html">Explorar ofertas académicas <span
-              aria-hidden="true">↗</span></a>
-          <a class="btn-nav-rounded btn-secondary" href="pages/Campus_Map.html">Conocer el campus <span
-              aria-hidden="true">↗</span></a>
-        </div>
-        <p class="location">PUERTO RICO <span>—</span> CONOCIMIENTO SIN LÍMITES</p>
+        <p class="location">Ciencia y tecnología, desde Puerto Rico.</p>
       </div>
 
       <div class="hero-panel">
-        <div class="ambient-visual" aria-hidden="true">
-          <span class="ambient-glow ambient-glow-blue"></span>
-          <span class="ambient-glow ambient-glow-violet"></span>
-          <span class="ambient-glow ambient-glow-sky"></span>
-        </div>
-        <div class="quick-links">
-          <p class="panel-label">DESCUBRE TU PRÓXIMO PASO</p>
-          <a class="access-card" href="pages/ofertas-academicas.html">
-
-            <h2>Encuentra tu camino.</h2>
-            <p>Explora nuestra oferta académica y empieza a imaginar tu futuro.</p>
-            <span class="card-link">Ver ofertas académicas <span aria-hidden="true">↗</span></span>
-          </a>
-          <a class="access-card access-card-campus" href="pages/Campus_Map.html">
-
-            <h2>Conoce tu espacio.</h2>
-            <p>Ubícate y descubre el campus de SC-TECH de Puerto Rico.</p>
-            <span class="card-link">Explorar el campus <span aria-hidden="true">↗</span></span>
-          </a>
-          <p class="panel-note"><span aria-hidden="true"></span>Tu talento. Tu camino. Tu futuro.</p>
-        </div>
+        <section class="slideshow" aria-roledescription="carrusel" aria-label="Aprender, descubrir y crear" data-slideshow>
+          <!-- Full-bleed photos; their captions have a separate inset. -->
+          <div class="slides" aria-live="off">
+            <figure class="slide is-active" role="group" aria-roledescription="diapositiva" aria-label="1 de 3" data-slide>
+              <img src="assets/images/home/comunidad.webp" alt="Estudiantes compartiendo ideas alrededor de una computadora en una biblioteca." width="1200" height="800" fetchpriority="high">
+              <figcaption>
+                <h2>Las ideas crecen en comunidad.</h2>
+                <p>Comparte tu curiosidad. Descubre otras perspectivas.</p>
+              </figcaption>
+            </figure>
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="2 de 3" aria-hidden="true" data-slide>
+              <img src="assets/images/home/investigacion.webp" alt="Instrumentos de vidrio y pipetas en una mesa de laboratorio." width="1200" height="800">
+              <figcaption>
+                <h2>Una pregunta abre nuevas posibilidades.</h2>
+                <p>La ciencia empieza con las ganas de saber más.</p>
+              </figcaption>
+            </figure>
+            <figure class="slide" role="group" aria-roledescription="diapositiva" aria-label="3 de 3" aria-hidden="true" data-slide>
+              <img src="assets/images/home/tecnologia.webp" alt="Personas colaborando y señalando la pantalla de una computadora portátil." width="1200" height="800">
+              <figcaption>
+                <h2>Imagina lo que puedes crear.</h2>
+                <p>Acércate a la tecnología. Dale forma a tu próxima idea.</p>
+              </figcaption>
+            </figure>
+          </div>
+          <div class="slideshow-controls" hidden>
+            <div class="slide-dots" aria-label="Seleccionar fotografía">
+              <button type="button" class="slide-dot" aria-label="Mostrar foto 1: comunidad" aria-pressed="true" data-slide-to="0"></button>
+              <button type="button" class="slide-dot" aria-label="Mostrar foto 2: ciencia" aria-pressed="false" data-slide-to="1"></button>
+              <button type="button" class="slide-dot" aria-label="Mostrar foto 3: tecnología" aria-pressed="false" data-slide-to="2"></button>
+            </div>
+            <span class="slide-count" aria-hidden="true"><span data-slide-current>1</span> / 3</span>
+            <div class="slide-buttons">
+              <button type="button" class="slide-control" aria-label="Foto anterior" data-slide-prev><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+              <button type="button" class="slide-control" aria-label="Foto siguiente" data-slide-next><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button>
+            </div>
+          </div>
+          <p class="sr-only" role="status" aria-live="polite" data-slide-status></p>
+        </section>
+        <p class="photo-note">Fotografías ilustrativas de la experiencia universitaria.</p>
       </div>
     </section>
 
+    <section class="feature-links" aria-label="Explora SC-TECH">
+      <a class="access-card" href="pages/ofertas-academicas.html">
+        <h2>Encuentra tu camino.</h2>
+        <p>Explora nuestra oferta académica y empieza a imaginar tu futuro.</p>
+        <span class="card-link">Ver ofertas académicas <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+      <a class="access-card access-card-campus" href="pages/Campus_Map.html">
+        <h2>Conoce tu espacio.</h2>
+        <p>Recorre el campus virtual en 3D y familiarízate con sus espacios.</p>
+        <span class="card-link">Explorar el campus <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></span>
+      </a>
+    </section>
+
     <section class="banner-container" aria-labelledby="welcome-title">
+      <h2 id="welcome-title">Conoce SC-TECH<br>de Puerto Rico.</h2>
       <div class="banner-copy">
-        <p class="eyebrow"><span></span> CIENCIA Y TECNOLOGÍA</p>
-        <h2 id="welcome-title">Conoce SC-TECH<br>de Puerto Rico.</h2>
-        <a class="text-link" href="pages/about-us.html">Más sobre nosotros <span aria-hidden="true">↗</span></a>
+        <p class="about-intro">Ciencia, tecnología y nuevas posibilidades para tu futuro. Conoce nuestra universidad y lo que nos inspira.</p>
+        <a class="text-link" href="pages/about-us.html">Más sobre nosotros <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
       </div>
-      <img src="assets/images/Banner_alpha_SC-Tech.png"
-        alt="Bienvenidos a SC-TECH de Puerto Rico, universidad especializada en ciencias y tecnología. Explora nuestra oferta académica y conoce más sobre nosotros."
-        class="site-banner" width="673" height="215" loading="lazy">
     </section>
   </main>
   <footer><span>SCTECH de Puerto Rico</span><span>Tu talento. Tu camino. Tu futuro.</span><span>© 2026 SCTECH</span>

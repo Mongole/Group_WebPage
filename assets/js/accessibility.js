@@ -26,6 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	// Close the accessibility menu with the keyboard.
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && !menu.hidden) {
+			menu.hidden = true;
+			toggleBtn.setAttribute('aria-expanded', 'false');
+			toggleBtn.focus();
+		}
+	});
+
 	// Dark Mode Toggle Listener
 	chkDark.addEventListener('change', (e) => {
 		const enabled = e.target.checked;

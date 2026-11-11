@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
-@import url('accessibility.css');
+@import url('Accessibility.css');
 
 :root {
   --azul: #4557DD;
@@ -109,7 +109,7 @@ footer {
   transition: background-color .2s ease, color .2s ease, transform .2s ease;
 }
 
-.btn-nav-rounded span {
+.btn-nav-rounded .icon {
   transition: transform .2s ease;
 }
 
@@ -122,24 +122,9 @@ footer {
   color: var(--azul);
 }
 
-.nav-links .btn-nav-rounded.active,
-.btn-primary {
+.nav-links .btn-nav-rounded.active {
   background: var(--azul);
   color: var(--blanco);
-}
-
-.btn-primary:hover {
-  background: #3545c5;
-  transform: translateY(-2px);
-}
-
-.btn-secondary {
-  background: transparent;
-  border-color: #4557dd38;
-}
-
-.btn-secondary:hover {
-  background: var(--azul-claro);
 }
 
 .btn-nav-rounded:hover span {
@@ -167,25 +152,6 @@ footer {
   min-width: 0;
 }
 
-.eyebrow,
-.panel-label {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-  line-height: 1.7;
-}
-
-.eyebrow span {
-  width: 7px;
-  height: 7px;
-  flex-shrink: 0;
-  background: var(--blue);
-  border-radius: 50%;
-}
-
 h1 {
   font-family: 'Syne', sans-serif;
   font-size: clamp(52px, 5.1vw, 76px);
@@ -208,13 +174,6 @@ h1 em {
   margin: 0;
 }
 
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 30px;
-}
-
 .location {
   font-size: 10px;
   letter-spacing: 1.3px;
@@ -223,157 +182,12 @@ h1 em {
   color: #68687d;
 }
 
-.location span {
-  padding: 0 8px;
-}
-
 .hero-panel {
   position: relative;
   isolation: isolate;
 }
 
-.ambient-visual {
-  position: absolute;
-  z-index: -1;
-  inset: -45px -24px;
-  overflow: hidden;
-  pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 35%, transparent 72%);
-  mask-image: radial-gradient(ellipse at center, #000 35%, transparent 72%);
-}
-
-.ambient-visual::before {
-  content: "";
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background-image: radial-gradient(#767cd640 1px, transparent 1px);
-  background-size: 22px 22px;
-  -webkit-mask-image: radial-gradient(ellipse at center, #0006, transparent 65%);
-  mask-image: radial-gradient(ellipse at center, #0006, transparent 65%);
-}
-
-.ambient-visual::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  top: 15%;
-  left: 28%;
-  width: 22%;
-  height: 70%;
-  border-radius: 50%;
-  background: linear-gradient(180deg, transparent, #ffffffa6, transparent);
-  filter: blur(20px);
-  transform: rotate(30deg);
-  animation: ambient-shimmer 9s ease-in-out infinite alternate;
-}
-
-.ambient-glow {
-  position: absolute;
-  display: block;
-  width: 58%;
-  height: 58%;
-  border-radius: 58% 42% 60% 40%;
-  filter: blur(20px);
-  animation: ambient-drift 10s ease-in-out infinite;
-}
-
-.ambient-glow-blue {
-  top: 10%;
-  left: 6%;
-  background: radial-gradient(ellipse at center, #6173ef80, #8799f538 48%, transparent 72%);
-}
-
-.ambient-glow-violet {
-  top: 28%;
-  left: 38%;
-  background: radial-gradient(ellipse at center, #9a8be970, #b4a8f330 48%, transparent 72%);
-  animation-name: ambient-drift-violet;
-  animation-duration: 12s;
-  animation-delay: -4s;
-}
-
-.ambient-glow-sky {
-  top: 46%;
-  left: 12%;
-  width: 50%;
-  height: 45%;
-  background: radial-gradient(ellipse at center, #8cc9ef70, #c0d9fc30 50%, transparent 72%);
-  animation-name: ambient-drift-sky;
-  animation-duration: 9s;
-  animation-delay: -6s;
-}
-
-@keyframes ambient-drift {
-
-  0%,
-  100% {
-    transform: translate(-12%, -12%) scale(.94) rotate(-8deg);
-  }
-
-  33% {
-    transform: translate(24%, -4%) scale(1.1) rotate(12deg);
-  }
-
-  66% {
-    transform: translate(3%, 24%) scale(1) rotate(-12deg);
-  }
-}
-
-@keyframes ambient-drift-violet {
-
-  0%,
-  100% {
-    transform: translate(12%, 10%) scale(1.06) rotate(12deg);
-  }
-
-  33% {
-    transform: translate(-26%, -16%) scale(.92) rotate(-14deg);
-  }
-
-  66% {
-    transform: translate(-6%, 24%) scale(1.12) rotate(8deg);
-  }
-}
-
-@keyframes ambient-drift-sky {
-
-  0%,
-  100% {
-    transform: translate(-14%, 12%) scale(.95) rotate(-12deg);
-  }
-
-  33% {
-    transform: translate(28%, -24%) scale(1.1) rotate(10deg);
-  }
-
-  66% {
-    transform: translate(-6%, -14%) scale(1) rotate(-6deg);
-  }
-}
-
-@keyframes ambient-shimmer {
-  from {
-    transform: translateX(-45%) rotate(30deg);
-    opacity: .35;
-  }
-
-  to {
-    transform: translateX(100%) rotate(12deg);
-    opacity: .75;
-  }
-}
-
-/* Quick links sit above the existing animated gradients. */
-.quick-links {
-  position: relative;
-  padding: 12px 0;
-}
-
-.panel-label {
-  color: #626279;
-  margin: 0 0 20px 24px;
-}
+/* Featured destination links. */
 
 .access-card {
   display: block;
@@ -400,27 +214,6 @@ h1 em {
   border-color: #d8dcf8;
 }
 
-.card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  color: var(--azul);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 1.5px;
-}
-
-.card-arrow {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 1px solid #4557dd26;
-  border-radius: 50%;
-  font-size: 18px;
-}
-
 .access-card h2 {
   margin: 14px 0 8px;
   font: 700 clamp(21px, 2vw, 27px)/1.2 'Syne', sans-serif;
@@ -444,22 +237,6 @@ h1 em {
   font-weight: 600;
 }
 
-.panel-note {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-  margin: 22px 4px 0;
-  font-size: 11px;
-  color: #626279;
-}
-
-.panel-note span {
-  width: 24px;
-  height: 1px;
-  background: #4557dd66;
-}
-
 /* The original banner becomes a supporting introduction below the hero. */
 .banner-container {
   display: grid;
@@ -471,20 +248,6 @@ h1 em {
   border: 1px solid #4557dd20;
   border-radius: 16px;
   background-color: #edeefa;
-  background-image:
-    linear-gradient(#4557dd08 1px, transparent 1px),
-    linear-gradient(90deg, #4557dd08 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-.banner-copy .eyebrow {
-  margin: 0 0 12px;
-}
-
-.banner-copy h2 {
-  font: 700 26px/1.25 'Syne', sans-serif;
-  letter-spacing: -.5px;
-  margin: 0 0 16px;
 }
 
 .text-link {
@@ -501,14 +264,6 @@ h1 em {
 
 .text-link:hover {
   color: var(--oscuro);
-}
-
-.site-banner {
-  display: block;
-  width: 100%;
-  max-width: 667px;
-  height: auto;
-  margin: 0 auto;
 }
 
 footer {
@@ -542,11 +297,6 @@ footer {
 
   .hero {
     gap: 32px;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    align-items: flex-start;
   }
 
   .access-card {
@@ -583,43 +333,14 @@ footer {
     max-width: 500px;
   }
 
-  .hero-actions {
-    flex-direction: row;
-  }
-
-  .quick-links {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .panel-label,
-  .panel-note {
-    grid-column: 1 / -1;
-    margin: 0;
-  }
-
   .access-card,
   .access-card-campus {
     margin: 0;
   }
 
-  .panel-note {
-    justify-content: flex-start;
-    margin-top: 6px;
-  }
-
-  .ambient-visual {
-    inset: -20px 0;
-  }
-
   .banner-container {
     gap: 24px;
     padding: 28px;
-  }
-
-  .banner-copy h2 {
-    font-size: 22px;
   }
 }
 
@@ -652,12 +373,6 @@ footer {
     gap: 32px;
   }
 
-  .eyebrow,
-  .panel-label {
-    font-size: 9px;
-    letter-spacing: 1px;
-  }
-
   h1 {
     font-size: clamp(38px, 8.5vw, 50px);
     letter-spacing: -1.8px;
@@ -669,29 +384,10 @@ footer {
     line-height: 1.75;
   }
 
-  .hero-actions {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 24px;
-  }
-
-  .hero-actions .btn-nav-rounded {
-    width: 100%;
-  }
-
   .location {
     font-size: 9px;
     letter-spacing: .8px;
     margin-top: 26px;
-  }
-
-  .location span {
-    padding: 0 3px;
-  }
-
-  .quick-links {
-    grid-template-columns: 1fr;
-    gap: 14px;
   }
 
   .access-card {
@@ -711,10 +407,6 @@ footer {
     padding: 24px 18px;
     gap: 24px;
     margin-bottom: 30px;
-  }
-
-  .banner-copy h2 br {
-    display: none;
   }
 
   footer {
@@ -783,6 +475,8 @@ body.is-entering {
   overflow: hidden;
   background: #4557dd1a;
 }
+
+/* Indeterminate loading feedback only: page-entry.js hides it within two seconds; reduced motion skips it. */
 
 .loader-track span {
   display: block;
@@ -855,18 +549,12 @@ body.is-entering {
     animation: none;
   }
 
-  .ambient-glow,
-  .ambient-visual::after {
-    animation: none;
-  }
-
   .btn-nav-rounded,
-  .btn-nav-rounded span,
+  .btn-nav-rounded .icon,
   .access-card {
     transition: none;
   }
 
-  .btn-primary:hover,
   .btn-nav-rounded:hover span,
   .access-card:hover {
     transform: none;
