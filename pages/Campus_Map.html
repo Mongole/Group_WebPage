@@ -7,10 +7,22 @@
 	<meta name="description"
 		content="Campus Map de SC-TECH de Puerto Rico.Explora las instalaciones y edificios del recinto.">
 	<title>Campus Map | SC-TECH de Puerto Rico</title>
+
 	<link rel="stylesheet" href="../assets/css/Campus_Map.css">
+	<script src="../assets/js/accessibility.js" defer></script>
 </head>
 
 <body>
+
+	<!-- Script para validar y cargar modos de accesibilidad antes de que cargue el cuerpo; problema en FireFox -->
+	<script>
+		(function () {
+			var dark = localStorage.getItem('theme_dark');
+			var highVis = localStorage.getItem('theme_high_vis');
+			if (dark === 'true') document.documentElement.classList.add('dark-mode');
+			if (highVis === 'true') document.documentElement.classList.add('disable-translucency');
+		})();
+	</script>
 
 	<header class="header">
 		<nav class="header-nav" aria-label="Navegación principal">
@@ -26,6 +38,31 @@
 						aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded active" href="Campus_Map.html">Campus Map <span aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded" href="about-us.html">About us <span aria-hidden="true">↗</span></a>
+
+				<!-- Contenedor para botón de accesibilidad -->
+				<div class="a11y-dropdown">
+					<button class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad" aria-expanded="false">
+						<!-- Squircle Icon with 3 Dashes -->
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+							stroke-linecap="round">
+							<line x1="4" y1="6" x2="20" y2="6" />
+							<line x1="4" y1="12" x2="20" y2="12" />
+							<line x1="4" y1="18" x2="20" y2="18" />
+						</svg>
+					</button>
+
+					<div class="a11y-menu" id="a11yMenu" hidden>
+						<p class="a11y-menu-title">Accesibilidad</p>
+						<label class="a11y-option">
+							<span>Modo Oscuro</span>
+							<input type="checkbox" id="chkDarkMode">
+						</label>
+						<label class="a11y-option">
+							<span>Alta Visibilidad (Sin Transparencias)</span>
+							<input type="checkbox" id="chkHighVisibility">
+						</label>
+					</div>
+				</div>
 			</div>
 		</nav>
 	</header>

@@ -1,0 +1,360 @@
+/* ==========================================================================
+   ACCESSIBILITY MENU & ACCESSIBILITY MODES
+   ========================================================================== */
+
+/* Dropdown Container & Toggle Button */
+.a11y-dropdown {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+}
+
+.btn-a11y {
+	min-height: 44px;
+	padding: 8px 14px;
+	border-radius: 12px;
+	background: transparent;
+	border: 1.5px solid var(--blue, #494fdb);
+	color: var(--blue, #494fdb);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-a11y:hover {
+	background: var(--blue, #494fdb);
+	color: #ffffff;
+}
+
+.a11y-menu {
+	position: absolute;
+	top: calc(100% + 10px);
+	right: 0;
+	width: 250px;
+	background: #ffffff;
+	border: 1.5px solid #c5cbdf;
+	border-radius: 14px;
+	padding: 16px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+	z-index: 9999;
+}
+
+.a11y-menu[hidden] {
+	display: none !important;
+}
+
+.a11y-menu-title {
+	font-weight: 700;
+	font-size: 14px;
+	margin: 0 0 12px 0;
+	color: #1c2140;
+	border-bottom: 1px solid #e0e4f0;
+	padding-bottom: 8px;
+}
+
+.a11y-option {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #1c2140;
+	cursor: pointer;
+}
+
+.a11y-option input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	accent-color: #494fdb;
+	cursor: pointer;
+}
+
+/* --------------------------------------------------------------------------
+   HEADER LIGHT / DARK MODE TRANSITION RESETS
+   -------------------------------------------------------------------------- */
+
+/* Explicit Light Mode Header Override (Forces immediate restoration when dark mode is toggled OFF) */
+html:not(.dark-mode) .header,
+body:not(.dark-mode) .header {
+	background: rgba(255, 255, 255, 0.94) !important;
+	border-bottom-color: rgba(69, 87, 221, 0.09) !important;
+}
+
+@supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+
+	html:not(.dark-mode) .header,
+	body:not(.dark-mode) .header {
+		background: rgba(255, 255, 255, 0.84) !important;
+		-webkit-backdrop-filter: blur(12px) !important;
+		backdrop-filter: blur(12px) !important;
+	}
+}
+
+/* Dark Mode Background & Core Overrides */
+html.dark-mode,
+body.dark-mode {
+	background-color: #0f131a !important;
+	color: #e2e8f0 !important;
+}
+
+html.dark-mode .header,
+body.dark-mode .header {
+	background: rgba(18, 24, 34, 0.95) !important;
+	border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+	backdrop-filter: blur(12px) !important;
+	-webkit-backdrop-filter: blur(12px) !important;
+}
+
+html.dark-mode .brand,
+body.dark-mode .brand {
+	color: #ffffff !important;
+}
+
+html.dark-mode .nav-links .btn-nav-rounded,
+body.dark-mode .nav-links .btn-nav-rounded {
+	background: rgba(255, 255, 255, 0.08) !important;
+	color: #cbd5e1 !important;
+	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+html.dark-mode .nav-links .btn-nav-rounded:hover,
+html.dark-mode .nav-links .btn-nav-rounded.active,
+body.dark-mode .nav-links .btn-nav-rounded:hover,
+body.dark-mode .nav-links .btn-nav-rounded.active {
+	background: #4557DD !important;
+	color: #ffffff !important;
+	border-color: #4557DD !important;
+}
+
+/* Text, Headings & Containers */
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+html.dark-mode .a11y-menu-title,
+body.dark-mode .a11y-menu-title,
+html.dark-mode .a11y-option,
+body.dark-mode .a11y-option {
+	color: #ffffff !important;
+}
+
+html.dark-mode .intro,
+html.dark-mode .access-card p,
+html.dark-mode .location,
+html.dark-mode .panel-label,
+html.dark-mode .panel-note,
+html.dark-mode footer,
+body.dark-mode .intro,
+body.dark-mode .access-card p,
+body.dark-mode .location,
+body.dark-mode .panel-label,
+body.dark-mode .panel-note,
+body.dark-mode footer {
+	color: #94a3b8 !important;
+}
+
+html.dark-mode .access-card,
+body.dark-mode .access-card {
+	background: #1e293b !important;
+	border-color: #334155 !important;
+	color: #ffffff !important;
+}
+
+html.dark-mode .access-card-campus,
+body.dark-mode .access-card-campus {
+	background: #172033 !important;
+	border-color: #25334d !important;
+}
+
+html.dark-mode .banner-container,
+body.dark-mode .banner-container {
+	background-color: #161e2e !important;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px) !important;
+	border-color: #2d3748 !important;
+}
+
+html.dark-mode .a11y-menu,
+body.dark-mode .a11y-menu {
+	background: #1e293b !important;
+	border-color: #334155 !important;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark-mode .btn-a11y,
+body.dark-mode .btn-a11y {
+	border-color: #60a5fa !important;
+	color: #60a5fa !important;
+}
+
+html.dark-mode .btn-a11y:hover,
+body.dark-mode .btn-a11y:hover {
+	background: #60a5fa !important;
+	color: #0f131a !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMPUS MAP & INSTRUCTIONS CARD
+   -------------------------------------------------------------------------- */
+html.dark-mode .campus-intro h1,
+body.dark-mode .campus-intro h1 {
+	color: #ffffff !important;
+}
+
+html.dark-mode .intro-lead,
+body.dark-mode .intro-lead {
+	color: #94a3b8 !important;
+}
+
+html.dark-mode .instructions-card,
+body.dark-mode .instructions-card {
+	background: #1e293b !important;
+	border-color: #334155 !important;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .instructions-card h2,
+body.dark-mode .instructions-card h2 {
+	color: #60a5fa !important;
+}
+
+html.dark-mode .instructions-card ul,
+body.dark-mode .instructions-card li,
+html.dark-mode .instructions-card kbd,
+body.dark-mode .instructions-card kbd {
+	color: #e2e8f0 !important;
+}
+
+html.dark-mode .instructions-card kbd,
+body.dark-mode .instructions-card kbd {
+	background: #0f131a !important;
+	border-color: #475569 !important;
+}
+
+html.dark-mode .map-wrapper,
+body.dark-mode .map-wrapper {
+	border-color: #334155 !important;
+}
+
+/* --------------------------------------------------------------------------
+   HIGH VISIBILITY / DISABLE TRANSLUCENCY
+   -------------------------------------------------------------------------- */
+
+/* Explicit Reset when High Visibility is OFF */
+html:not(.disable-translucency) .header,
+body:not(.disable-translucency) .header {
+  border-width: 1px !important;
+}
+
+html:not(.disable-translucency) .access-card,
+body:not(.disable-translucency) .access-card,
+html:not(.disable-translucency) .banner-container,
+body:not(.disable-translucency) .banner-container,
+html:not(.disable-translucency) .instructions-card,
+body:not(.disable-translucency) .instructions-card,
+html:not(.disable-translucency) .a11y-menu,
+body:not(.disable-translucency) .a11y-menu {
+  border-width: 1px !important;
+}
+
+html:not(.disable-translucency) .ambient-visual,
+body:not(.disable-translucency) .ambient-visual,
+html:not(.disable-translucency) .ambient-glow,
+body:not(.disable-translucency) .ambient-glow {
+  display: block !important;
+}
+
+/* High Visibility ON Overrides */
+html.disable-translucency .header,
+body.disable-translucency .header,
+html.disable-translucency .access-card,
+body.disable-translucency .access-card,
+html.disable-translucency .banner-container,
+body.disable-translucency .banner-container,
+html.disable-translucency .instructions-card,
+body.disable-translucency .instructions-card,
+html.disable-translucency .a11y-menu,
+body.disable-translucency .a11y-menu {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: #ffffff !important;
+  border: 2px solid #1c2140 !important;
+  box-shadow: none !important;
+}
+
+html.disable-translucency .header,
+body.disable-translucency .header,
+html.disable-translucency .access-card,
+body.disable-translucency .access-card,
+html.disable-translucency .banner-container,
+body.disable-translucency .banner-container,
+html.disable-translucency .instructions-card,
+body.disable-translucency .instructions-card,
+html.disable-translucency .a11y-menu,
+body.disable-translucency .a11y-menu {
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	background-color: #ffffff !important;
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.disable-translucency .map-wrapper,
+body.disable-translucency .map-wrapper {
+	border: 2px solid #1c2140 !important;
+}
+
+html.dark-mode.disable-translucency,
+body.dark-mode.disable-translucency {
+	background-color: #000000 !important;
+}
+
+html.dark-mode.disable-translucency .header,
+body.dark-mode.disable-translucency .header,
+html.dark-mode.disable-translucency .access-card,
+body.dark-mode.disable-translucency .access-card,
+html.dark-mode.disable-translucency .banner-container,
+body.dark-mode.disable-translucency .banner-container,
+html.dark-mode.disable-translucency .instructions-card,
+body.dark-mode.disable-translucency .instructions-card,
+html.dark-mode.disable-translucency .a11y-menu,
+body.dark-mode.disable-translucency .a11y-menu {
+	background-color: #0b0f19 !important;
+	border: 2px solid #ffffff !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .map-wrapper,
+body.dark-mode.disable-translucency .map-wrapper {
+	border: 2px solid #ffffff !important;
+}
+
+html.disable-translucency .btn-nav-rounded,
+body.disable-translucency .btn-nav-rounded,
+html.disable-translucency .btn-a11y,
+body.disable-translucency .btn-a11y {
+	border: 2px solid #1c2140 !important;
+	font-weight: 700 !important;
+}
+
+html.dark-mode.disable-translucency .btn-nav-rounded,
+body.dark-mode.disable-translucency .btn-nav-rounded,
+html.dark-mode.disable-translucency .btn-a11y,
+body.dark-mode.disable-translucency .btn-a11y {
+	border: 2px solid #ffffff !important;
+	color: #ffffff !important;
+	font-weight: 700 !important;
+}
+
+html.disable-translucency .ambient-visual,
+body.disable-translucency .ambient-visual,
+html.disable-translucency .ambient-glow,
+body.disable-translucency .ambient-glow {
+	display: none !important;
+}
