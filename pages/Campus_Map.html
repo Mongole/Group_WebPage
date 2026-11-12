@@ -10,6 +10,7 @@
 
 	<link rel="stylesheet" href="../assets/css/Campus_Map.css">
 	<script src="../assets/js/accessibility.js" defer></script>
+	<script src="../assets/js/acordeon_Jayden.js" defer></script>
 </head>
 
 <body>
@@ -19,8 +20,10 @@
 		(function () {
 			var dark = localStorage.getItem('theme_dark');
 			var highVis = localStorage.getItem('theme_high_vis');
+			var largeText = localStorage.getItem('theme_large_text');
 			if (dark === 'true') document.documentElement.classList.add('dark-mode');
 			if (highVis === 'true') document.documentElement.classList.add('disable-translucency');
+			if (largeText === 'true') document.documentElement.classList.add('large-text');
 		})();
 	</script>
 
@@ -41,13 +44,11 @@
 
 				<!-- Contenedor para botón de accesibilidad -->
 				<div class="a11y-dropdown">
-					<button class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad" aria-expanded="false">
-						<!-- Squircle Icon with 3 Dashes -->
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-							stroke-linecap="round">
-							<line x1="4" y1="6" x2="20" y2="6" />
-							<line x1="4" y1="12" x2="20" y2="12" />
-							<line x1="4" y1="18" x2="20" y2="18" />
+					<button type="button" class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad"
+						aria-expanded="false" aria-controls="a11yMenu">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+							<circle cx="12" cy="4" r="2" />
+							<path d="M12 8v7M5 9l7 2 7-2M12 15l-4 6M12 15l4 6" />
 						</svg>
 					</button>
 
@@ -61,6 +62,10 @@
 							<span>Alta Visibilidad (Sin Transparencias)</span>
 							<input type="checkbox" id="chkHighVisibility">
 						</label>
+						<label class="a11y-option">
+							<span>Texto Ampliado</span>
+							<input type="checkbox" id="chkLargeText">
+						</label>
 					</div>
 				</div>
 			</div>
@@ -73,14 +78,169 @@
 			<h1>Recinto Virtual 3D - SC-TECH</h1>
 			<p class="intro-lead">
 				Bienvenido al mapa interactivo de SC-TECH de Puerto Rico. Aquí podrás explorar nuestro recinto de manera virtual
-				y familiarizarte con el plano de las instalaciones.
+				y familiarizarte con el plano de las instalaciones. Hay varias herramientas que podrán utilizar para una
+				exploración más cómoda de nuestra universidad.
 			</p>
+
+			<!-- Acordeon por Jayden, esta area detalla el mapa, descripción por Cristian-->
+			<div class="acordeon-grupo">
+
+				<!-- ############ ACORDEÓN 1: Acciones del menu ############ -->
+				<div class="acordeon">
+
+					<h3 class="acordeon-titulo">
+						<button class="acordeon-btn" type="button">
+							<!-- >>> EDITA AQUÍ LA PALABRA (el título) -->
+							Sobre el menú
+							<span class="acordeon-icono" aria-hidden="true"></span>
+						</button>
+					</h3>
+
+					<div class="acordeon-panel">
+						<div class="acordeon-interior">
+							<div class="acordeon-contenido">
+								<!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "PROGRAMAS ACADÉMICOS"
+               Cada <p> es un párrafo. Copia y pega otro <p> si necesitas más. -->
+								<p>Aquí podras conocer sobre las funciones del menú interactivo en el mapa:</p>
+								<ul>
+									<li>
+										<b>Vista mapa/orbita:</b>
+										<p>
+											Aquí podras visualizar todo el campus y podrás interactuar para acercar, disminuir y mover.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Caminar por el campus:</b>
+										<p>
+											Entrarás en perspectiva en primera persona y podrás moverte por todo el mapa para observar todo el
+											campus.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Volver a vista general:</b>
+										<p>
+											Restaurará la cámara a la vista mapa/órbita.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Mostrar/Ocultar Rotulos:</b>
+										<p>
+											Mostrará u ocultará las marcas de identificación de los edificios del campus.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Modo dia/noche:</b>
+										<p>
+											Cambiará el estado del mapa a día o a noche, cambiando la iluminación.
+										</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ############ ACORDEÓN 2: sobre las instalaciones ############ -->
+				<div class="acordeon">
+
+					<h3 class="acordeon-titulo">
+						<button class="acordeon-btn" type="button">
+							<!-- >>> EDITA AQUÍ LA PALABRA (el título) -->
+							Sobre las instalaciones
+							<span class="acordeon-icono" aria-hidden="true"></span>
+						</button>
+					</h3>
+
+					<div class="acordeon-panel">
+						<div class="acordeon-interior">
+							<div class="acordeon-contenido">
+								<!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "PROGRAMAS ACADÉMICOS"
+               Cada <p> es un párrafo. Copia y pega otro <p> si necesitas más. -->
+								<p>Aquí podrás conocer sobre los edificios que forman nuestro recinto;
+									Este terreno consta de 9 edificios en los que se encontraran:
+								</p>
+								<p>
+								<ul>
+									<li>
+										<b>Estacionamiento y seguridad:</b>
+										<p>
+											Aquí se encontrara la seguridad del campus como guardias de seguridad y vigilancia y las áreas de
+											estacionamiento del campus.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Servicios de emergencia:</b>
+										<p>
+											Aquí se encontrara la área de enfermería en casos de emergencia para que puedan ser rápidamente
+											atendidos.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Administracion:</b>
+										<p>
+											Aquí se encontrará la Administración de Empresas, Contabilidad, Finanzas, Facultad Académica, en
+											donde se ayudará al estudiante con todo el tema de la economía.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Torre de vigilancia:</b>
+										<p>
+											Aquí se encuentra parte de seguridad para la vigilancia y monitoreo del campus.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Edificio central:</b>
+										<p>
+											Aquí se encuentra el admisiones y servicio estudiantil para ayudar y solucionar toda pregunta y
+											problema que tengan los estudiantes y matrícula de estudiantes.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Alas adminitrativa este:</b>
+										<p>
+											Aquí se encontrará administración, decanato, asuntos académicos, recursos humanos para ayudar a
+											los estudiantes en temas académicos.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Ala académica oeste:</b>
+										<p>
+											Aquí se encontrará el área de ingeniería, ciencias naturales y laboratorios académicos.
+										</p>
+										<hr>
+									</li>
+									<li>
+										<b>Aulas de clase:</b>
+										<p>
+											Aquí se encontrarán las aulas de clase de todos los cursos que ofrece este campus.
+										</p>
+									</li>
+								</ul>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
 
 			<!-- Area para instrucciones sobre los controles del mapa -->
 			<div class="instructions-card">
 				<h2>Controles de Navegación</h2>
 				<ul>
-					<li><strong>Modo Órbita:</strong> Arrastra con el clic izquierdo para rotar la cámara y usa la rueda del ratón
+					<li><strong>Modo Órbita:</strong> Arrastra con el clic izquierdo para rotar la cámara y usa la rueda del
+						ratón
 						para hacer zoom. Haz clic sobre cualquier edificio para ver su descripción.</li>
 					<li><strong>Modo Caminar:</strong> Usa las teclas <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> o las
 						flechas del teclado para desplazarte. Mueve el ratón para dirigir la vista y mantén presionada la tecla

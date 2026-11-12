@@ -45,6 +45,18 @@
 	display: none !important;
 }
 
+.icon {
+	display: block;
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
 .a11y-menu-title {
 	font-weight: 700;
 	font-size: 14px;
@@ -249,7 +261,7 @@ body.dark-mode .map-wrapper {
 /* Explicit Reset when High Visibility is OFF */
 html:not(.disable-translucency) .header,
 body:not(.disable-translucency) .header {
-  border-width: 1px !important;
+	border-width: 1px !important;
 }
 
 html:not(.disable-translucency) .access-card,
@@ -260,14 +272,14 @@ html:not(.disable-translucency) .instructions-card,
 body:not(.disable-translucency) .instructions-card,
 html:not(.disable-translucency) .a11y-menu,
 body:not(.disable-translucency) .a11y-menu {
-  border-width: 1px !important;
+	border-width: 1px !important;
 }
 
 html:not(.disable-translucency) .ambient-visual,
 body:not(.disable-translucency) .ambient-visual,
 html:not(.disable-translucency) .ambient-glow,
 body:not(.disable-translucency) .ambient-glow {
-  display: block !important;
+	display: block !important;
 }
 
 /* High Visibility ON Overrides */
@@ -281,11 +293,11 @@ html.disable-translucency .instructions-card,
 body.disable-translucency .instructions-card,
 html.disable-translucency .a11y-menu,
 body.disable-translucency .a11y-menu {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background-color: #ffffff !important;
-  border: 2px solid #1c2140 !important;
-  box-shadow: none !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+	background-color: #ffffff !important;
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
 }
 
 html.disable-translucency .header,
@@ -357,4 +369,80 @@ body.disable-translucency .ambient-visual,
 html.disable-translucency .ambient-glow,
 body.disable-translucency .ambient-glow {
 	display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   TEXT SIZE SCALING MODE
+   -------------------------------------------------------------------------- */
+html.large-text {
+	font-size: 112.5%;
+	/* Scales root font baseline from 16px to ~18px */
+}
+
+/* Ensure headings & key UI scale cleanly without breaking flex containers */
+html.large-text h1 {
+	font-size: clamp(58px, 5.8vw, 84px) !important;
+}
+
+html.large-text h2 {
+	font-size: 1.25em !important;
+}
+
+html.large-text p,
+html.large-text .intro,
+html.large-text .intro-lead,
+html.large-text .btn-nav-rounded {
+	font-size: 1.1em !important;
+}
+
+html.large-text .a11y-menu {
+	width: 270px !important;
+	/* Slightly expand popup menu width to prevent text wrapping */
+}
+
+/* --------------------------------------------------------------------------
+   ACCORDION COMPONENT (DARK MODE & HIGH VISIBILITY)
+   -------------------------------------------------------------------------- */
+html.dark-mode .acordeon,
+body.dark-mode .acordeon {
+	background: #1e293b !important;
+	border-color: #334155 !important;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .acordeon-btn,
+body.dark-mode .acordeon-btn {
+	background: #1e293b !important;
+	color: #60a5fa !important;
+}
+
+html.dark-mode .acordeon-btn:hover,
+body.dark-mode .acordeon-btn:hover {
+	background: #273549 !important;
+}
+
+html.dark-mode .acordeon.abierto>.acordeon-titulo>.acordeon-btn,
+body.dark-mode .acordeon.abierto>.acordeon-titulo>.acordeon-btn {
+	background: #4557DD !important;
+	color: #ffffff !important;
+}
+
+html.dark-mode .acordeon-contenido,
+body.dark-mode .acordeon-contenido,
+html.dark-mode .acordeon-contenido li,
+body.dark-mode .acordeon-contenido li {
+	color: #e2e8f0 !important;
+}
+
+/* High Visibility Borders */
+html.disable-translucency .acordeon,
+body.disable-translucency .acordeon {
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .acordeon,
+body.dark-mode.disable-translucency .acordeon {
+	background: #0b0f19 !important;
+	border: 2px solid #ffffff !important;
 }

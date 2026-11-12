@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acordeón - Sctech de Puerto Rico</title>
+
+<!-- ============================================================
+     ACORDEÓN (sección que se expande y se contrae)
+
+     CÓMO EDITAR (lo más importante):
+       Busca los comentarios que dicen ">>> EDITA AQUÍ".
+       Justo debajo de cada uno está el TEXTO que se muestra
+       cuando se abre ESA palabra. Cámbialo ahí mismo.
+       El título (la palabra) también se cambia en su botón.
+
+     El archivo tiene 4 PASOS:
+       PASO 1 (HTML) : la estructura  → botón + panel
+       PASO 2 (CSS)  : el diseño      → colores, tamaños, ícono
+       PASO 3 (CSS)  : la animación   → abrir y cerrar suave
+       PASO 4 (JS)   : la función     → hace que el clic funcione
+     ============================================================ -->
+
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- COLORES (los mismos de los botones anteriores) ---------- */
+  :root {
+    --azul: #4557DD;
+    --azul-claro: #DDE1FA;
+    --oscuro: #1c2140;
+    --blanco: #FFFFFF;
+    --fondo: #F3F4F8;
+  }
+
+  body {
+    margin: 0;
+    padding: 40px;
+    background: var(--fondo);
+    color: var(--oscuro);
+    font-family: 'DM Sans', system-ui, sans-serif;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--azul);
+    margin: 0 0 32px;
+  }
+
+  /* Caja que agrupa todos los acordeones y limita su ancho */
+  .acordeon-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 720px;
+  }
+
+  /* ============================================================
+     PASO 2 · DISEÑO
+     ============================================================ */
+
+  /* 2.1 · Cada acordeón completo (la tarjeta que envuelve botón + panel) */
+  .acordeon {
+    background: var(--blanco);
+    border: 2px solid var(--azul-claro);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* 2.2 · El título que contiene el botón (sin márgenes extra) */
+  .acordeon-titulo { margin: 0; }
+
+  /* 2.3 · El botón que se toca para abrir/cerrar */
+  .acordeon-btn {
+    display: flex;
+    justify-content: space-between;   /* palabra a la izquierda, ícono a la derecha */
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    min-height: 56px;
+    padding: 14px 22px;
+    border: 0;
+    background: var(--blanco);
+    color: var(--oscuro);
+    font: 800 16px 'Syne', sans-serif;
+    text-align: left;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .acordeon-btn:hover { background: var(--azul-claro); }
+  .acordeon-btn:focus-visible { outline: 3px solid var(--oscuro); outline-offset: -3px; }
+
+  /* 2.4 · Cuando el acordeón está ABIERTO (tiene la clase "abierto"),
+     su botón se pone azul. El signo ">" significa "solo el hijo directo",
+     así abrir uno NO pinta de azul a los de adentro. */
+  .acordeon.abierto > .acordeon-titulo > .acordeon-btn {
+    background: var(--azul);
+    color: var(--blanco);
+  }
+
+  /* 2.5 · El ícono "+" (dos líneas: una horizontal y una vertical) */
+  .acordeon-icono {
+    position: relative;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+  }
+  .acordeon-icono::before,
+  .acordeon-icono::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.3s;
+  }
+  .acordeon-icono::before { top: 9px; left: 0;   width: 20px; height: 3px; }  /* horizontal */
+  .acordeon-icono::after  { top: 0;   left: 9px; width: 3px;  height: 20px; } /* vertical */
+
+  /* Al abrir, la línea vertical gira: el "+" se convierte en "−" */
+  .acordeon.abierto > .acordeon-titulo .acordeon-icono::after {
+    transform: rotate(90deg);
+  }
+
+  /* 2.6 · El texto que aparece dentro del panel */
+  .acordeon-contenido {
+    padding: 18px 22px 22px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .acordeon-contenido p { margin: 0 0 10px; }
+  .acordeon-contenido p:last-child { margin-bottom: 0; }
+
+  /* 2.7 · Acordeón dentro de otro acordeón (jerarquía) */
+  .acordeon-contenido .acordeon { margin-top: 12px; }
+
+  /* ============================================================
+     PASO 3 · ANIMACIÓN
+     Truco: un panel con "grid" cambia de alto 0 → completo suavemente.
+       cerrado = 0fr   (alto cero)
+       abierto = 1fr   (alto completo)
+     ============================================================ */
+
+  /* 3.1 · Estado CERRADO (el normal) */
+  .acordeon-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;      /* el teclado no entra a contenido escondido */
+    transition: grid-template-rows 0.3s ease, visibility 0.3s;
+  }
+
+  /* 3.2 · Estado ABIERTO: el acordeón tiene la clase "abierto".
+     El ">" hace que solo se abra SU panel y no los de adentro. */
+  .acordeon.abierto > .acordeon-panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  /* 3.3 · Caja interna: overflow hidden + min-height 0
+     para que el contenido se esconda cuando el alto es cero. */
+  .acordeon-interior {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Respeta a quien tiene desactivadas las animaciones en su dispositivo */
+  @media (prefers-reduced-motion: reduce) {
+    .acordeon-panel, .acordeon-icono::before, .acordeon-icono::after { transition: none; }
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Acordeón · Sctech de Puerto Rico</h1>
+
+<div class="acordeon-grupo">
+
+  <!-- ============================================================
+       PASO 1 · ESTRUCTURA HTML
+       Cada acordeón tiene 3 piezas:
+         [A] el contenedor → <div class="acordeon">
+         [B] el botón      → <button class="acordeon-btn">  (la palabra)
+         [C] el panel      → <div class="acordeon-panel">   (la información)
+
+       Para que un acordeón EMPIECE ABIERTO, agrégale la clase "abierto":
+         <div class="acordeon abierto">
+       ============================================================ -->
+
+
+  <!-- ############ ACORDEÓN 1: PROGRAMAS ############ -->
+  <div class="acordeon abierto">
+
+    <h3 class="acordeon-titulo">
+      <button class="acordeon-btn" type="button">
+        <!-- >>> EDITA AQUÍ LA PALABRA (el título) -->
+        Programas académicos
+        <span class="acordeon-icono" aria-hidden="true"></span>
+      </button>
+    </h3>
+
+    <div class="acordeon-panel">
+      <div class="acordeon-interior">
+        <div class="acordeon-contenido">
+          <!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "PROGRAMAS ACADÉMICOS"
+               Cada <p> es un párrafo. Copia y pega otro <p> si necesitas más. -->
+          <p>Aquí va la información de los programas de ciencias y tecnología de Sctech.</p>
+          <p>Escribe aquí el segundo párrafo, o bórralo si no lo necesitas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ############ ACORDEÓN 2: ADMISIONES ############ -->
+  <div class="acordeon">
+
+    <h3 class="acordeon-titulo">
+      <button class="acordeon-btn" type="button">
+        <!-- >>> EDITA AQUÍ LA PALABRA (el título) -->
+        Admisiones
+        <span class="acordeon-icono" aria-hidden="true"></span>
+      </button>
+    </h3>
+
+    <div class="acordeon-panel">
+      <div class="acordeon-interior">
+        <div class="acordeon-contenido">
+          <!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "ADMISIONES" -->
+          <p>Aquí van los requisitos y los pasos para solicitar admisión.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ############ ACORDEÓN 3: LABORATORIOS ############
+       Este tiene acordeones ADENTRO (jerarquía). Funciona igual:
+       se copia la misma estructura dentro de "acordeon-contenido". -->
+  <div class="acordeon">
+
+    <h3 class="acordeon-titulo">
+      <button class="acordeon-btn" type="button">
+        <!-- >>> EDITA AQUÍ LA PALABRA (el título) -->
+        Laboratorios
+        <span class="acordeon-icono" aria-hidden="true"></span>
+      </button>
+    </h3>
+
+    <div class="acordeon-panel">
+      <div class="acordeon-interior">
+        <div class="acordeon-contenido">
+          <!-- >>> EDITA AQUÍ EL TEXTO GENERAL DE "LABORATORIOS" -->
+          <p>Selecciona un laboratorio para ver más detalles.</p>
+
+          <!-- ---------- SUB-ACORDEÓN 3.1: ELECTRÓNICA ---------- -->
+          <div class="acordeon">
+            <h4 class="acordeon-titulo">
+              <button class="acordeon-btn" type="button">
+                <!-- >>> EDITA AQUÍ LA PALABRA -->
+                Electrónica
+                <span class="acordeon-icono" aria-hidden="true"></span>
+              </button>
+            </h4>
+            <div class="acordeon-panel">
+              <div class="acordeon-interior">
+                <div class="acordeon-contenido">
+                  <!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "ELECTRÓNICA" -->
+                  <p>Aquí va la información del laboratorio de electrónica.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ---------- SUB-ACORDEÓN 3.2: COMPUTADORAS ---------- -->
+          <div class="acordeon">
+            <h4 class="acordeon-titulo">
+              <button class="acordeon-btn" type="button">
+                <!-- >>> EDITA AQUÍ LA PALABRA -->
+                Computadoras
+                <span class="acordeon-icono" aria-hidden="true"></span>
+              </button>
+            </h4>
+            <div class="acordeon-panel">
+              <div class="acordeon-interior">
+                <div class="acordeon-contenido">
+                  <!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "COMPUTADORAS" -->
+                  <p>Aquí va la información del laboratorio de computadoras.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ============================================================
+     PASO 4 · JAVASCRIPT (la función que hace que funcione)
+     No necesitas editar nada aquí. Este código:
+       - le pone a cada acordeón su estado (abierto / cerrado)
+       - escucha el clic en cada botón
+       - abre SOLO el que tocaste y cierra los demás del mismo nivel
+     ============================================================ -->
+<script>
+  /* 4.1 · FUNCIÓN: ponerEstado
+     Abre o cierra UN acordeón.
+       - classList.toggle  → agrega o quita la clase "abierto" (el CSS hace el resto)
+       - aria-expanded     → avisa a lectores de pantalla si está abierto */
+  function ponerEstado(acordeon, abrir) {
+    const boton = acordeon.querySelector(':scope > .acordeon-titulo > .acordeon-btn');
+    acordeon.classList.toggle('abierto', abrir);
+    boton.setAttribute('aria-expanded', String(abrir));
+  }
+
+  /* 4.2 · FUNCIÓN: alAtocar
+     Se ejecuta al hacer clic en un botón. */
+  function alAtocar(acordeon) {
+    const abrir = !acordeon.classList.contains('abierto');   // ¿estaba cerrado? entonces abrir
+
+    // Si vamos a abrir este, cerramos los demás que están a su mismo nivel,
+    // para que se vea información de UNA sola palabra a la vez.
+    if (abrir) {
+      acordeon.parentElement
+        .querySelectorAll(':scope > .acordeon')
+        .forEach(function (otro) {
+          if (otro !== acordeon) ponerEstado(otro, false);
+        });
+    }
+
+    ponerEstado(acordeon, abrir);
+  }
+
+  /* 4.3 · PREPARAR TODOS LOS ACORDEONES
+     querySelectorAll busca cada ".acordeon" de la página.
+     forEach recorre la lista y a cada uno le:
+       a) conecta el botón con su panel (id + aria-controls), solo para accesibilidad
+       b) deja su estado inicial (abierto si tiene la clase "abierto")
+       c) le pone el "oído" de clic (addEventListener) */
+  document.querySelectorAll('.acordeon').forEach(function (acordeon, numero) {
+    const boton = acordeon.querySelector(':scope > .acordeon-titulo > .acordeon-btn');
+    const panel = acordeon.querySelector(':scope > .acordeon-panel');
+
+    panel.id = 'panel-' + numero;                       // a) nombre único para el panel
+    boton.setAttribute('aria-controls', panel.id);
+
+    ponerEstado(acordeon, acordeon.classList.contains('abierto'));   // b)
+
+    boton.addEventListener('click', function () {       // c)
+      alAtocar(acordeon);
+    });
+  });
+</script>
+
+</body>
+</html>

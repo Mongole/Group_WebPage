@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const menu = document.getElementById('a11yMenu');
 	const chkDark = document.getElementById('chkDarkMode');
 	const chkHighVis = document.getElementById('chkHighVisibility');
+	const chkLargeText = document.getElementById('chkLargeText');
 
 	// Add this during script load to keep UI and CSS synced in Firefox:
 	if (chkHighVis) {
@@ -79,3 +80,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.body.classList.add('disable-translucency');
 	}
 });
+
+// 1. Sync state on initial page load
+const isLargeText = localStorage.getItem('theme_large_text') === 'true';
+if (chkLargeText) chkLargeText.checked = isLargeText;
+
+document.documentElement.classList.toggle('large-text', isLargeText);
+document.body.classList.toggle('large-text', isLargeText);
+
+// 2. Add event listener
+if (chkLargeText) {
+	chkLargeText.addEventListener('change', (e) => {
+		const enabled = e.target.checked;
+		document.documentElement.classList.toggle('large-text', enabled);
+		document.body.classList.toggle('large-text', enabled);
+		localStorage.setItem('theme_large_text', enabled);
+	});
+}

@@ -104,6 +104,170 @@ body {
 	transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
 
+/* Acordeon por Jayden */
+/* Caja que agrupa todos los acordeones y limita su ancho */
+.acordeon-grupo {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	width: 100%;
+	margin-bottom: 16px;
+	align-items: start;
+	/* Prevents the closed accordion from stretching vertically when the other opens */
+}
+
+/* ============================================================
+     PASO 2 · DISEÑO
+     ============================================================ */
+
+/* 2.1 · Cada acordeón completo (la tarjeta que envuelve botón + panel) */
+.acordeon {
+	background: var(--blanco);
+	border: 1px solid var(--azul-claro);
+	border-radius: 12px;
+	box-shadow: 0 4px 16px rgba(28, 33, 64, 0.04);
+	overflow: hidden;
+}
+
+/* 2.2 · El título que contiene el botón (sin márgenes extra) */
+.acordeon-titulo {
+	margin: 0;
+}
+
+/* 2.3 · El botón que se toca para abrir/cerrar */
+.acordeon-btn {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+	width: 100%;
+	min-height: 56px;
+	padding: 16px 24px;
+	border: 0;
+	background: var(--blanco);
+	color: var(--azul);
+	font: 700 18px 'Syne', sans-serif;
+	text-align: left;
+	cursor: pointer;
+	transition: background 0.2s, color 0.2s;
+}
+
+.acordeon-btn:hover {
+	background: var(--azul-claro);
+}
+
+.acordeon-btn:focus-visible {
+	outline: 3px solid var(--oscuro);
+	outline-offset: -3px;
+}
+
+/* 2.4 · Cuando el acordeón está ABIERTO (tiene la clase "abierto"),
+     su botón se pone azul. El signo ">" significa "solo el hijo directo",
+     así abrir uno NO pinta de azul a los de adentro. */
+.acordeon.abierto>.acordeon-titulo>.acordeon-btn {
+	background: var(--azul);
+	color: var(--blanco);
+}
+
+/* 2.5 · El ícono "+" (dos líneas: una horizontal y una vertical) */
+.acordeon-icono {
+	position: relative;
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+}
+
+.acordeon-icono::before,
+.acordeon-icono::after {
+	content: "";
+	position: absolute;
+	background: currentColor;
+	border-radius: 2px;
+	transition: transform 0.3s;
+}
+
+.acordeon-icono::before {
+	top: 9px;
+	left: 0;
+	width: 20px;
+	height: 3px;
+}
+
+/* horizontal */
+.acordeon-icono::after {
+	top: 0;
+	left: 9px;
+	width: 3px;
+	height: 20px;
+}
+
+/* vertical */
+
+/* Al abrir, la línea vertical gira: el "+" se convierte en "−" */
+.acordeon.abierto>.acordeon-titulo .acordeon-icono::after {
+	transform: rotate(90deg);
+}
+
+/* 2.6 · El texto que aparece dentro del panel */
+.acordeon-contenido {
+	padding: 18px 22px 22px;
+	font-size: 16px;
+	line-height: 1.6;
+}
+
+.acordeon-contenido p {
+	margin: 0 0 10px;
+}
+
+.acordeon-contenido p:last-child {
+	margin-bottom: 0;
+}
+
+/* 2.7 · Acordeón dentro de otro acordeón (jerarquía) */
+.acordeon-contenido .acordeon {
+	margin-top: 12px;
+}
+
+/* ============================================================
+     PASO 3 · ANIMACIÓN
+     Truco: un panel con "grid" cambia de alto 0 → completo suavemente.
+       cerrado = 0fr   (alto cero)
+       abierto = 1fr   (alto completo)
+     ============================================================ */
+
+/* 3.1 · Estado CERRADO (el normal) */
+.acordeon-panel {
+	display: grid;
+	grid-template-rows: 0fr;
+	visibility: hidden;
+	/* el teclado no entra a contenido escondido */
+	transition: grid-template-rows 0.3s ease, visibility 0.3s;
+}
+
+/* 3.2 · Estado ABIERTO: el acordeón tiene la clase "abierto".
+     El ">" hace que solo se abra SU panel y no los de adentro. */
+.acordeon.abierto>.acordeon-panel {
+	grid-template-rows: 1fr;
+	visibility: visible;
+}
+
+/* 3.3 · Caja interna: overflow hidden + min-height 0
+     para que el contenido se esconda cuando el alto es cero. */
+.acordeon-interior {
+	overflow: hidden;
+	min-height: 0;
+}
+
+/* Respeta a quien tiene desactivadas las animaciones en su dispositivo */
+@media (prefers-reduced-motion: reduce) {
+
+	.acordeon-panel,
+	.acordeon-icono::before,
+	.acordeon-icono::after {
+		transition: none;
+	}
+}
+
 .btn-nav-rounded span {
 	font-size: 12px;
 	transition: transform 0.2s ease;
@@ -160,6 +324,7 @@ main {
 	border-radius: 12px;
 	padding: 24px;
 	box-shadow: 0 4px 16px rgba(28, 33, 64, 0.04);
+	margin-bottom: 24px;
 }
 
 .instructions-card h2 {
@@ -245,6 +410,10 @@ footer {
 		gap: 12px;
 		align-items: center;
 		text-align: center;
+	}
+
+	.acordeon-grupo {
+		grid-template-columns: 1fr;
 	}
 }
 

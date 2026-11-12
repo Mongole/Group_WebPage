@@ -17,8 +17,10 @@
 		(function () {
 			var dark = localStorage.getItem('theme_dark');
 			var highVis = localStorage.getItem('theme_high_vis');
+			var largeText = localStorage.getItem('theme_large_text');
 			if (dark === 'true') document.documentElement.classList.add('dark-mode');
 			if (highVis === 'true') document.documentElement.classList.add('disable-translucency');
+			if (largeText === 'true') document.documentElement.classList.add('large-text');
 		})();
 	</script>
 
@@ -39,13 +41,11 @@
 
 				<!-- Contenedor para botón de accesibilidad -->
 				<div class="a11y-dropdown">
-					<button class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad" aria-expanded="false">
-						<!-- Squircle Icon with 3 Dashes -->
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-							stroke-linecap="round">
-							<line x1="4" y1="6" x2="20" y2="6" />
-							<line x1="4" y1="12" x2="20" y2="12" />
-							<line x1="4" y1="18" x2="20" y2="18" />
+					<button type="button" class="btn-a11y" id="a11yToggle" aria-label="Opciones de accesibilidad"
+						aria-expanded="false" aria-controls="a11yMenu">
+						<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+							<circle cx="12" cy="4" r="2" />
+							<path d="M12 8v7M5 9l7 2 7-2M12 15l-4 6M12 15l4 6" />
 						</svg>
 					</button>
 
@@ -58,6 +58,10 @@
 						<label class="a11y-option">
 							<span>Alta Visibilidad (Sin Transparencias)</span>
 							<input type="checkbox" id="chkHighVisibility">
+						</label>
+						<label class="a11y-option">
+							<span>Texto Ampliado</span>
+							<input type="checkbox" id="chkLargeText">
 						</label>
 					</div>
 				</div>
