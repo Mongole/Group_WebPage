@@ -3,12 +3,19 @@ const formStatus = document.getElementById('formStatus');
 
 contactForm.addEventListener('submit', function (event) {
 	event.preventDefault();
-	formStatus.innerHTML = `
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+	const isEnglish = (localStorage.getItem('site_lang') || document.documentElement.lang) === 'en';
+	formStatus.innerHTML = isEnglish
+		? `	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 				<circle cx="12" cy="12" r="10"/>
 				<path d="m9 12 2 2 4-4"/>
 			</svg>
-			<span><strong>Mensaje recibido (Demostración):</strong> Gracias por escribirnos. Esta es una vista previa visual y tu mensaje no se ha enviado.</span>
+			<strong>Message received (Demo):</strong> Thank you for writing to us. This is a visual preview and your message has not been sent.
+		`
+		: `	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+				<circle cx="12" cy="12" r="10"/>
+				<path d="m9 12 2 2 4-4"/>
+			</svg>
+			<strong>Mensaje recibido (Demostración):</strong> Gracias por escribirnos. Esta es una vista previa visual y tu mensaje no se ha enviado.
 		`;
 	this.reset();
 });

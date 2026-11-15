@@ -18,6 +18,7 @@
 	<link rel="stylesheet" href="../assets/css/home.css">
 	<script src="../assets/js/accessibility.js" defer></script>
 	<script src="../assets/js/acordeon_Jayden.js" defer></script>
+	<script src="../assets/js/i18n.js" defer></script>
 </head>
 
 <body>
@@ -35,20 +36,25 @@
 	</script>
 
 	<header class="header">
-		<a class="skip-link" href="#main-content">Ir al contenido</a>
+		<a class="skip-link" href="#main-content" data-i18n="nav.skip">Ir al contenido</a>
 		<nav class="header-nav" aria-label="Navegación principal">
 			<a class="brand" href="../index.html">
 				<span class="brand-icon">
 					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40" height="41">
 				</span>
-				<div class="brand-name">SC-TECH<span>DE PUERTO RICO</span></div>
+				<div class="brand-name">SC-TECH<span data-i18n="brand.sub">DE PUERTO RICO</span></div>
 			</a>
 			<div class="nav-links">
-				<a class="btn-nav-rounded" href="../index.html">Inicio <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded" href="ofertas-academicas.html">Ofertas Académicas <span
+				<a class="btn-nav-rounded" href="../index.html"><span class="nav-label" data-i18n="nav.home">Inicio</span> <span
 						aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded active" href="Campus_Map.html">Mapa del Recinto <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded" href="about-us.html">Sobre Nosotros <span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded" href="ofertas-academicas.html"><span class="nav-label"
+						data-i18n="nav.programs">Ofertas Académicas</span>
+					<span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded active" href="Campus_Map.html" aria-current="page"><span class="nav-label"
+						data-i18n="nav.map">Mapa del
+						Recinto</span> <span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded" href="about-us.html"><span class="nav-label" data-i18n="nav.about">Sobre
+						Nosotros</span> <span aria-hidden="true">↗</span></a>
 
 				<!-- Contenedor para botón de accesibilidad -->
 				<div class="a11y-dropdown">
@@ -61,18 +67,22 @@
 					</button>
 
 					<div class="a11y-menu" id="a11yMenu" hidden>
-						<p class="a11y-menu-title">Accesibilidad</p>
+						<p class="a11y-menu-title" data-i18n="a11y.title">Accesibilidad</p>
 						<label class="a11y-option">
-							<span>Modo Oscuro</span>
+							<span data-i18n="a11y.darkmode">Modo Oscuro</span>
 							<input type="checkbox" id="chkDarkMode">
 						</label>
 						<label class="a11y-option">
-							<span>Alta Visibilidad (Sin Transparencias)</span>
+							<span data-i18n="a11y.highvis">Alta Visibilidad (Sin Transparencias)</span>
 							<input type="checkbox" id="chkHighVisibility">
 						</label>
 						<label class="a11y-option">
-							<span>Texto Ampliado</span>
+							<span data-i18n="a11y.augtext">Texto Ampliado</span>
 							<input type="checkbox" id="chkLargeText">
+						</label>
+						<label class="a11y-option">
+							<span data-i18n="a11y.lang">Idioma (English)</span>
+							<input type="checkbox" id="chkLanguage">
 						</label>
 					</div>
 				</div>
@@ -288,8 +298,8 @@
 	</main>
 
 	<footer>
-		<span>SCTECH de Puerto Rico</span>
-		<span>Tu talento. Tu camino. Tu futuro.</span>
+		<span data-i18n="footer.lead">SCTECH de Puerto Rico</span>
+		<span data-i18n="footer.tail">Tu talento. Tu camino. Tu futuro.</span>
 		<span>© 2026 SCTECH</span>
 	</footer>
 
