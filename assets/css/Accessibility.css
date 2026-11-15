@@ -849,3 +849,33 @@ body.dark-mode .acordeon:has(.acordeon-btn:focus-visible) {
 	border-color: #60a5fa !important;
 	background-color: #273549 !important;
 }
+
+/* Pop-up al usar tecla tab */
+.skip-link {
+	position: fixed;
+	top: 12px;
+	left: 16px;
+	z-index: 9999;
+	padding: 10px 16px;
+	border-radius: 8px;
+	background: #4557DD;
+	color: #ffffff;
+	font: 600 14px 'DM Sans', sans-serif;
+	text-decoration: none;
+	transform: translateY(-200%);
+	transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+	transform: translateY(0);
+}
+
+html.dark-mode .skip-link,
+body.dark-mode .skip-link {
+	background: #60a5fa;
+	color: #0f131a;
+}
+
+main:focus {
+	outline: none;
+}

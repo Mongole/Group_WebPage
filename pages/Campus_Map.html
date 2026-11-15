@@ -1,3 +1,10 @@
+<!--
+    Equipo de trabajo:
+    Josean - Programador
+		Alexander - Programador
+		Alexander - Graficos
+		Christian - Texto
+-->
 <!DOCTYPE html>
 <html lang="es">
 
@@ -38,10 +45,10 @@
 			</a>
 			<div class="nav-links">
 				<a class="btn-nav-rounded" href="../index.html">Inicio <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded" href="ofertas-academicas.html">Ofertas académicas <span
+				<a class="btn-nav-rounded" href="ofertas-academicas.html">Ofertas Académicas <span
 						aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded active" href="Campus_Map.html">Campus Map <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded" href="about-us.html">About us <span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded active" href="Campus_Map.html">Mapa del Recinto <span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded" href="about-us.html">Sobre Nosotros <span aria-hidden="true">↗</span></a>
 
 				<!-- Contenedor para botón de accesibilidad -->
 				<div class="a11y-dropdown">
@@ -102,20 +109,20 @@
 							<div class="acordeon-contenido">
 								<!-- >>> EDITA AQUÍ LA INFORMACIÓN DE "PROGRAMAS ACADÉMICOS"
                Cada <p> es un párrafo. Copia y pega otro <p> si necesitas más. -->
-								<p>Aquí podras conocer sobre las funciones del menú interactivo en el mapa:</p>
+								<p>Aquí podrás conocer sobre las funciones del menú interactivo en el mapa:</p>
 								<ul>
 									<li>
 										<b>Vista mapa/orbita:</b>
 										<p>
-											Aquí podras visualizar todo el campus y podrás interactuar para acercar, disminuir y mover.
+											Aquí podrás visualizar todo el recinto y podrás interactuar para acercar, disminuir y mover.
 										</p>
 										<hr>
 									</li>
 									<li>
-										<b>Caminar por el campus:</b>
+										<b>Caminar por el recinto:</b>
 										<p>
 											Entrarás en perspectiva en primera persona y podrás moverte por todo el mapa para observar todo el
-											campus.
+											recinto.
 										</p>
 										<hr>
 									</li>
@@ -129,7 +136,7 @@
 									<li>
 										<b>Mostrar/Ocultar Rotulos:</b>
 										<p>
-											Mostrará u ocultará las marcas de identificación de los edificios del campus.
+											Mostrará u ocultará las marcas de identificación de los edificios del recinto.
 										</p>
 										<hr>
 									</li>
@@ -169,8 +176,8 @@
 									<li>
 										<b>Estacionamiento y seguridad:</b>
 										<p>
-											Aquí se encontrara la seguridad del campus como guardias de seguridad y vigilancia y las áreas de
-											estacionamiento del campus.
+											Aquí se encontrara la seguridad del recinto como guardias de seguridad y vigilancia y las áreas de
+											estacionamiento.
 										</p>
 										<hr>
 									</li>
@@ -193,7 +200,7 @@
 									<li>
 										<b>Torre de vigilancia:</b>
 										<p>
-											Aquí se encuentra parte de seguridad para la vigilancia y monitoreo del campus.
+											Aquí se encuentra parte de seguridad para la vigilancia y monitoreo del recinto.
 										</p>
 										<hr>
 									</li>
@@ -223,7 +230,7 @@
 									<li>
 										<b>Aulas de clase:</b>
 										<p>
-											Aquí se encontrarán las aulas de clase de todos los cursos que ofrece este campus.
+											Aquí se encontrarán las aulas de clase de todos los cursos que ofrece este recinto.
 										</p>
 									</li>
 								</ul>
@@ -278,39 +285,40 @@
 				hidden>
 			</iframe>
 		</section>
+	</main>
 
-		<footer>
-			<span>SCTECH de Puerto Rico</span>
-			<span>Tu talento. Tu camino. Tu futuro.</span>
-			<span>© 2026 SCTECH</span>
-		</footer>
+	<footer>
+		<span>SCTECH de Puerto Rico</span>
+		<span>Tu talento. Tu camino. Tu futuro.</span>
+		<span>© 2026 SCTECH</span>
+	</footer>
 
-		<script>
-			(function () {
-				const btnLoadMap = document.getElementById('btnLoadMap');
-				const mapOverlay = document.getElementById('mapOverlay');
-				const mapFrame = document.getElementById('virtualMapFrame');
+	<script>
+		(function () {
+			const btnLoadMap = document.getElementById('btnLoadMap');
+			const mapOverlay = document.getElementById('mapOverlay');
+			const mapFrame = document.getElementById('virtualMapFrame');
 
-				if (!btnLoadMap || !mapOverlay || !mapFrame) return;
+			if (!btnLoadMap || !mapOverlay || !mapFrame) return;
 
-				btnLoadMap.addEventListener('click', function () {
-					btnLoadMap.disabled = true;
-					btnLoadMap.textContent = 'Cargando entorno 3D…';
+			btnLoadMap.addEventListener('click', function () {
+				btnLoadMap.disabled = true;
+				btnLoadMap.textContent = 'Cargando entorno 3D…';
 
-					// Reveal iframe and assign src to start 3D initialization
-					mapFrame.hidden = false;
-					mapFrame.src = mapFrame.dataset.src;
+				// Reveal iframe and assign src to start 3D initialization
+				mapFrame.hidden = false;
+				mapFrame.src = mapFrame.dataset.src;
 
-					// Fade out overlay once the iframe finishes loading
-					mapFrame.addEventListener('load', function () {
-						mapOverlay.classList.add('is-hidden');
-						setTimeout(function () {
-							mapOverlay.remove();
-						}, 350);
-					}, { once: true });
-				});
-			})();
-		</script>
+				// Fade out overlay once the iframe finishes loading
+				mapFrame.addEventListener('load', function () {
+					mapOverlay.classList.add('is-hidden');
+					setTimeout(function () {
+						mapOverlay.remove();
+					}, 350);
+				}, { once: true });
+			});
+		})();
+	</script>
 
 </body>
 
