@@ -70,16 +70,38 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-top: 12px;
+	gap: 12px;
+	width: 100%;
+	min-height: 44px;
+	margin-top: 4px;
+	padding: 8px 10px;
+	border-radius: 8px;
 	font-size: 13px;
 	font-weight: 500;
 	color: #1c2140;
 	cursor: pointer;
+	user-select: none;
+	transition: background-color 0.15s ease;
+}
+
+.a11y-option:hover {
+	background-color: #eef0fd;
+}
+
+html.dark-mode .a11y-option:hover,
+body.dark-mode .a11y-option:hover {
+	background-color: #273549 !important;
+}
+
+.a11y-option span {
+	flex: 1;
+	line-height: 1.35;
 }
 
 .a11y-option input[type="checkbox"] {
-	width: 16px;
-	height: 16px;
+	width: 18px;
+	height: 18px;
+	flex-shrink: 0;
 	accent-color: #4557DD;
 	cursor: pointer;
 }

@@ -3,13 +3,19 @@
 document.addEventListener('DOMContentLoaded', () => {
 	const toggleBtn = document.getElementById('a11yToggle');
 	const menu = document.getElementById('a11yMenu');
+	const dropdown = document.querySelector('.a11y-dropdown');
 	const chkDark = document.getElementById('chkDarkMode');
 	const chkHighVis = document.getElementById('chkHighVisibility');
 	const chkLargeText = document.getElementById('chkLargeText');
 
-	// Add this during script load to keep UI and CSS synced in Firefox:
-	if (chkHighVis) {
-		document.body.classList.toggle('disable-translucency', chkHighVis.checked);
+	if (!toggleBtn || !menu || !dropdown) return;
+
+	function closeMenu(returnFocus = false) {
+		if (!menu.hidden) {
+			menu.hidden = true;
+			toggleBtn.setAttribute('aria-expanded', 'false');
+			if (returnFocus) toggleBtn.focus();
+		}
 	}
 
 	// Toggle Popup
@@ -19,112 +25,104 @@ document.addEventListener('DOMContentLoaded', () => {
 		menu.hidden = isExpanded;
 	});
 
-	// Close when clicking outside
-	document.addEventListener('click', (e) => {
-		if (!toggleBtn.contains(e.target) && !menu.contains(e.target)) {
-			menu.hidden = true;
-			toggleBtn.setAttribute('aria-expanded', 'false');
+	// Close only when clicking/tapping outside .a11y-dropdown
+	document.addEventListener('pointerdown', (e) => {
+		if (!menu.hidden && !dropdown.contains(e.target)) {
+			closeMenu(false);
 		}
 	});
 
-	// Close the accessibility menu with the keyboard.
+	// Close on Escape and return focus to the toggle button
 	document.addEventListener('keydown', (e) => {
 		if (e.key === 'Escape' && !menu.hidden) {
-			menu.hidden = true;
-			toggleBtn.setAttribute('aria-expanded', 'false');
-			toggleBtn.focus();
-		}
-	});
-
-	// Dark Mode Toggle Listener
-	chkDark.addEventListener('change', (e) => {
-		const enabled = e.target.checked;
-
-		document.documentElement.classList.toggle('dark-mode', enabled);
-		document.body.classList.toggle('dark-mode', enabled);
-		localStorage.setItem('theme_dark', enabled);
-
-		// Force header background repaint on index.html
-		const header = document.querySelector('.header');
-		if (header) {
-			if (!enabled) {
-				header.style.backgroundColor = '';
-				header.style.backdropFilter = '';
-			}
-		}
-	});
-
-	// High Visibility Change Listener
-	chkHighVis.addEventListener('change', (e) => {
-		const enabled = e.target.checked;
-
-		document.documentElement.classList.toggle('disable-translucency', enabled);
-		document.body.classList.toggle('disable-translucency', enabled);
-		localStorage.setItem('theme_high_vis', enabled);
-
-		// Force style repaint for ambient visuals and borders
-		const header = document.querySelector('.header');
-		if (header && !enabled) {
-			header.style.backdropFilter = '';
-			header.style.webkitBackdropFilter = '';
-		}
-	});
-
-	// Restore saved preferences
-	if (localStorage.getItem('theme_dark') === 'true') {
-		chkDark.checked = true;
-		document.body.classList.add('dark-mode');
-	}
-	if (localStorage.getItem('theme_high_vis') === 'true') {
-		chkHighVis.checked = true;
-		document.body.classList.add('disable-translucency');
-	}
-});
-
-// 1. Sync state on initial page load
-const isLargeText = localStorage.getItem('theme_large_text') === 'true';
-if (chkLargeText) chkLargeText.checked = isLargeText;
-
-document.documentElement.classList.toggle('large-text', isLargeText);
-document.body.classList.toggle('large-text', isLargeText);
-
-// 2. Add event listener
-if (chkLargeText) {
-	chkLargeText.addEventListener('change', (e) => {
-		const enabled = e.target.checked;
-		document.documentElement.classList.toggle('large-text', enabled);
-		document.body.classList.toggle('large-text', enabled);
-		localStorage.setItem('theme_large_text', enabled);
-	});
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-	const a11yToggle = document.getElementById('a11yToggle');
-	const a11yMenu = document.getElementById('a11yMenu');
-	const a11yDropdown = document.querySelector('.a11y-dropdown');
-
-	if (!a11yToggle || !a11yMenu || !a11yDropdown) return;
-
-	function closeMenu(returnFocus = false) {
-		if (!a11yMenu.hidden) {
-			a11yMenu.hidden = true;
-			a11yToggle.setAttribute('aria-expanded', 'false');
-			if (returnFocus) a11yToggle.focus();
-		}
-	}
-
-	// Close on Escape and return focus to the accessibility button
-	document.addEventListener('keydown', (e) => {
-		if (e.key === 'Escape' && !a11yMenu.hidden) {
 			e.preventDefault();
 			closeMenu(true);
 		}
 	});
 
-	// Close automatically when tabbing completely out of the dropdown
-	a11yDropdown.addEventListener('focusout', (e) => {
-		if (!a11yDropdown.contains(e.relatedTarget)) {
+	// Close only when a keyboard user Tabs past the first or last focusable item inside .a11y-dropdown
+	dropdown.addEventListener('keydown', (e) => {
+		if (e.key !== 'Tab' || menu.hidden) return;
+
+		const focusables = Array.from(
+			dropdown.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')
+		);
+		if (!focusables.length) return;
+
+		const first = focusables[0];
+		const last = focusables[focusables.length - 1];
+
+		if (e.shiftKey && document.activeElement === first) {
+			closeMenu(false);
+		} else if (!e.shiftKey && document.activeElement === last) {
 			closeMenu(false);
 		}
 	});
+
+	// Close on Escape and return focus to the toggle button
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && !menu.hidden) {
+			e.preventDefault();
+			closeMenu(true);
+		}
+	});
+
+	// Dark Mode Toggle Listener
+	if (chkDark) {
+		chkDark.addEventListener('change', (e) => {
+			const enabled = e.target.checked;
+			document.documentElement.classList.toggle('dark-mode', enabled);
+			document.body.classList.toggle('dark-mode', enabled);
+			localStorage.setItem('theme_dark', enabled);
+
+			const header = document.querySelector('.header');
+			if (header && !enabled) {
+				header.style.backgroundColor = '';
+				header.style.backdropFilter = '';
+			}
+		});
+	}
+
+	// High Visibility Change Listener
+	if (chkHighVis) {
+		chkHighVis.addEventListener('change', (e) => {
+			const enabled = e.target.checked;
+			document.documentElement.classList.toggle('disable-translucency', enabled);
+			document.body.classList.toggle('disable-translucency', enabled);
+			localStorage.setItem('theme_high_vis', enabled);
+
+			const header = document.querySelector('.header');
+			if (header && !enabled) {
+				header.style.backdropFilter = '';
+				header.style.webkitBackdropFilter = '';
+			}
+		});
+	}
+
+	// Large Text Change Listener
+	if (chkLargeText) {
+		chkLargeText.addEventListener('change', (e) => {
+			const enabled = e.target.checked;
+			document.documentElement.classList.toggle('large-text', enabled);
+			document.body.classList.toggle('large-text', enabled);
+			localStorage.setItem('theme_large_text', enabled);
+		});
+	}
+
+	// Restore & sync saved preferences on load
+	const isDark = localStorage.getItem('theme_dark') === 'true';
+	const isHighVis = localStorage.getItem('theme_high_vis') === 'true';
+	const isLargeText = localStorage.getItem('theme_large_text') === 'true';
+
+	if (chkDark) chkDark.checked = isDark;
+	document.documentElement.classList.toggle('dark-mode', isDark);
+	document.body.classList.toggle('dark-mode', isDark);
+
+	if (chkHighVis) chkHighVis.checked = isHighVis;
+	document.documentElement.classList.toggle('disable-translucency', isHighVis);
+	document.body.classList.toggle('disable-translucency', isHighVis);
+
+	if (chkLargeText) chkLargeText.checked = isLargeText;
+	document.documentElement.classList.toggle('large-text', isLargeText);
+	document.body.classList.toggle('large-text', isLargeText);
 });
