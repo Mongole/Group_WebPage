@@ -14,8 +14,8 @@
 	padding: 8px 14px;
 	border-radius: 12px;
 	background: transparent;
-	border: 1.5px solid var(--blue, #494fdb);
-	color: var(--blue, #494fdb);
+	border: 1.5px solid var(--blue, #4557DD);
+	color: var(--blue, #4557DD);
 	cursor: pointer;
 	display: flex;
 	align-items: center;
@@ -24,7 +24,7 @@
 }
 
 .btn-a11y:hover {
-	background: var(--blue, #494fdb);
+	background: var(--blue, #4557DD);
 	color: #ffffff;
 }
 
@@ -80,7 +80,7 @@
 .a11y-option input[type="checkbox"] {
 	width: 16px;
 	height: 16px;
-	accent-color: #494fdb;
+	accent-color: #4557DD;
 	cursor: pointer;
 }
 
@@ -109,7 +109,12 @@ body:not(.dark-mode) .header {
 html.dark-mode,
 body.dark-mode {
 	background-color: #0f131a !important;
-	color: #e2e8f0 !important;
+	color: #f1f5f9 !important;
+}
+
+html.dark-mode .program-image,
+body.dark-mode .program-image {
+	background: transparent !important;
 }
 
 html.dark-mode .header,
@@ -120,16 +125,47 @@ body.dark-mode .header {
 	-webkit-backdrop-filter: blur(12px) !important;
 }
 
+/* Unified Brand Logo Colors (Light & Dark Mode) */
+.brand,
+.brand-name,
+.brand div span {
+	color: #4557DD !important;
+}
+
 html.dark-mode .brand,
-body.dark-mode .brand {
-	color: #ffffff !important;
+body.dark-mode .brand,
+html.dark-mode .brand-name,
+body.dark-mode .brand-name,
+html.dark-mode .brand div span,
+body.dark-mode .brand div span {
+	color: #60a5fa !important;
+}
+
+/* Unified Hero Accent Word across Home, Ofertas Académicas, and About Us */
+.hero h1 em,
+.hero h1 span,
+.about-hero h1 em,
+.about-hero h1 span {
+	color: #4557DD !important;
+	font-style: normal;
+}
+
+html.dark-mode .hero h1 em,
+body.dark-mode .hero h1 em,
+html.dark-mode .hero h1 span,
+body.dark-mode .hero h1 span,
+html.dark-mode .about-hero h1 em,
+body.dark-mode .about-hero h1 em,
+html.dark-mode .about-hero h1 span,
+body.dark-mode .about-hero h1 span {
+	color: #60a5fa !important;
 }
 
 html.dark-mode .nav-links .btn-nav-rounded,
 body.dark-mode .nav-links .btn-nav-rounded {
-	background: rgba(255, 255, 255, 0.08) !important;
+	background: transparent !important;
 	color: #cbd5e1 !important;
-	border: 1px solid rgba(255, 255, 255, 0.12) !important;
+	border: 1px solid transparent !important;
 }
 
 html.dark-mode .nav-links .btn-nav-rounded:hover,
@@ -252,6 +288,40 @@ body.dark-mode .instructions-card kbd {
 html.dark-mode .map-wrapper,
 body.dark-mode .map-wrapper {
 	border-color: #334155 !important;
+}
+
+html.dark-mode .map-wrapper,
+body.dark-mode .map-wrapper,
+html.dark-mode .map-overlay,
+body.dark-mode .map-overlay {
+	background: radial-gradient(circle at 50% 45%, #1e293b 0%, #0f131a 100%) !important;
+	border-color: #334155 !important;
+}
+
+html.dark-mode .map-overlay-content p,
+body.dark-mode .map-overlay-content p {
+	color: #94a3b8 !important;
+}
+
+html.disable-translucency .map-overlay,
+body.disable-translucency .map-overlay {
+	background: #ffffff !important;
+}
+
+html.dark-mode.disable-translucency .map-overlay,
+body.dark-mode.disable-translucency .map-overlay {
+	background: #0b0f19 !important;
+}
+
+html.disable-translucency .btn-load-map,
+body.disable-translucency .btn-load-map {
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .btn-load-map,
+body.dark-mode.disable-translucency .btn-load-map {
+	border: 2px solid #ffffff !important;
 }
 
 /* --------------------------------------------------------------------------
@@ -400,6 +470,24 @@ html.large-text .a11y-menu {
 	/* Slightly expand popup menu width to prevent text wrapping */
 }
 
+html.large-text .program-header,
+body.large-text .program-header {
+	height: auto !important;
+	min-height: 76px !important;
+}
+
+html.large-text .program-title,
+body.large-text .program-title {
+	font-size: 18px !important;
+	line-height: 1.25 !important;
+}
+
+html.large-text .program-summary,
+body.large-text .program-summary {
+	font-size: 14px !important;
+	line-height: 1.35 !important;
+}
+
 /* --------------------------------------------------------------------------
    ACCORDION COMPONENT (DARK MODE & HIGH VISIBILITY)
    -------------------------------------------------------------------------- */
@@ -445,4 +533,297 @@ html.dark-mode.disable-translucency .acordeon,
 body.dark-mode.disable-translucency .acordeon {
 	background: #0b0f19 !important;
 	border: 2px solid #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   OFERTAS ACADÉMICAS (DARK MODE & HIGH VISIBILITY)
+   -------------------------------------------------------------------------- */
+html.dark-mode .main-content,
+body.dark-mode .main-content {
+	background-color: #161e2e !important;
+	box-shadow: 0 10px 35px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .program,
+body.dark-mode .program {
+	background-color: #1e293b !important;
+	border-color: #334155 !important;
+	color: #ffffff !important;
+}
+
+html.dark-mode .program:hover,
+body.dark-mode .program:hover {
+	background-color: #273549 !important;
+	border-color: #60a5fa !important;
+}
+
+html.dark-mode .program-summary,
+body.dark-mode .program-summary,
+html.dark-mode .program-group-label,
+body.dark-mode .program-group-label,
+html.dark-mode .course-note,
+body.dark-mode .course-note {
+	color: #94a3b8 !important;
+}
+
+html.dark-mode .emoji-circle,
+body.dark-mode .emoji-circle {
+	background-color: #0f131a !important;
+}
+
+html.dark-mode .info-panel,
+body.dark-mode .info-panel {
+	background-color: #1e293b !important;
+	border: 1px solid #334155 !important;
+}
+
+html.dark-mode .benefit,
+body.dark-mode .benefit {
+	background-color: #0f131a !important;
+	color: #ffffff !important;
+}
+
+html.dark-mode .benefit-icon,
+body.dark-mode .benefit-icon {
+	background-color: #1e293b !important;
+	color: #60a5fa !important;
+}
+
+html.dark-mode .map-placeholder,
+body.dark-mode .map-placeholder {
+	background: #1e293b !important;
+	border-color: #60a5fa !important;
+}
+
+/* High Visibility Borders */
+html.disable-translucency .main-content,
+body.disable-translucency .main-content,
+html.disable-translucency .program,
+body.disable-translucency .program,
+html.disable-translucency .info-panel,
+body.disable-translucency .info-panel,
+html.disable-translucency .benefit,
+body.disable-translucency .benefit {
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .main-content,
+body.dark-mode.disable-translucency .main-content,
+html.dark-mode.disable-translucency .program,
+body.dark-mode.disable-translucency .program,
+html.dark-mode.disable-translucency .info-panel,
+body.dark-mode.disable-translucency .info-panel,
+html.dark-mode.disable-translucency .benefit,
+body.dark-mode.disable-translucency .benefit {
+	background-color: #0b0f19 !important;
+	border: 2px solid #ffffff !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode .map-placeholder,
+body.dark-mode .map-placeholder {
+	background: radial-gradient(circle at 50% 48%, #26334d 0%, #161e2e 65%, #0f131a 100%) !important;
+	border-color: #334155 !important;
+	box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark-mode .map-placeholder img,
+body.dark-mode .map-placeholder img {
+	filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6)) !important;
+}
+
+/* --------------------------------------------------------------------------
+   ABOUT US & CONTACT PAGE (DARK MODE & HIGH VISIBILITY)
+   -------------------------------------------------------------------------- */
+html.dark-mode .hero-copy,
+body.dark-mode .hero-copy,
+html.dark-mode .about-card p,
+body.dark-mode .about-card p,
+html.dark-mode .contact-details>p:not(.eyebrow),
+body.dark-mode .contact-details>p:not(.eyebrow),
+html.dark-mode .contact-list dt,
+body.dark-mode .contact-list dt,
+html.dark-mode .demo-note,
+body.dark-mode .demo-note,
+html.dark-mode .form-note,
+body.dark-mode .form-note {
+	color: #94a3b8 !important;
+}
+
+html.dark-mode .eyebrow,
+body.dark-mode .eyebrow,
+html.dark-mode .contact-list a,
+body.dark-mode .contact-list a {
+	color: #60a5fa !important;
+}
+
+html.dark-mode .about-card,
+body.dark-mode .about-card {
+	background-color: #1e293b !important;
+	border-color: #334155 !important;
+	box-shadow: 0 16px 45px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .about-card-accent,
+body.dark-mode .about-card-accent {
+	background-color: #172033 !important;
+	border-color: #25334d !important;
+}
+
+html.dark-mode .card-number,
+body.dark-mode .card-number {
+	background-color: #0f131a !important;
+	color: #60a5fa !important;
+}
+
+html.dark-mode .contact-section,
+body.dark-mode .contact-section {
+	background-color: #161e2e !important;
+	border-color: #2d3748 !important;
+}
+
+html.dark-mode .contact-list dd,
+body.dark-mode .contact-list dd,
+html.dark-mode .contact-form label,
+body.dark-mode .contact-form label {
+	color: #f1f5f9 !important;
+}
+
+html.dark-mode .contact-form,
+body.dark-mode .contact-form {
+	background-color: #1e293b !important;
+	border-color: #334155 !important;
+	box-shadow: 0 16px 45px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .contact-form input,
+body.dark-mode .contact-form input,
+html.dark-mode .contact-form textarea,
+body.dark-mode .contact-form textarea {
+	background-color: #0f131a !important;
+	border-color: #475569 !important;
+	color: #f1f5f9 !important;
+}
+
+html.dark-mode .form-status,
+body.dark-mode .form-status {
+	background-color: rgba(20, 83, 45, 0.35) !important;
+	border-color: #166534 !important;
+	border-left-color: #4ade80 !important;
+	color: #bbf7d0 !important;
+}
+
+html.dark-mode .form-status svg,
+body.dark-mode .form-status svg {
+	color: #4ade80 !important;
+}
+
+html.disable-translucency .form-status,
+body.disable-translucency .form-status {
+	border: 2px solid #14532d !important;
+	border-left-width: 5px !important;
+}
+
+html.dark-mode.disable-translucency .form-status,
+body.dark-mode.disable-translucency .form-status {
+	background-color: #0b0f19 !important;
+	border: 2px solid #4ade80 !important;
+	border-left-width: 5px !important;
+	color: #ffffff !important;
+}
+
+/* High Visibility Borders */
+html.disable-translucency .about-card,
+body.disable-translucency .about-card,
+html.disable-translucency .contact-section,
+body.disable-translucency .contact-section,
+html.disable-translucency .contact-form,
+body.disable-translucency .contact-form,
+html.disable-translucency .contact-form input,
+body.disable-translucency .contact-form input,
+html.disable-translucency .contact-form textarea,
+body.disable-translucency .contact-form textarea {
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .about-card,
+body.dark-mode.disable-translucency .about-card,
+html.dark-mode.disable-translucency .contact-section,
+body.dark-mode.disable-translucency .contact-section,
+html.dark-mode.disable-translucency .contact-form,
+body.dark-mode.disable-translucency .contact-form,
+html.dark-mode.disable-translucency .contact-form input,
+body.dark-mode.disable-translucency .contact-form input,
+html.dark-mode.disable-translucency .contact-form textarea,
+body.dark-mode.disable-translucency .contact-form textarea {
+	background-color: #0b0f19 !important;
+	border: 2px solid #ffffff !important;
+	box-shadow: none !important;
+}
+
+/* Floating Back to Top Button Overrides */
+html.dark-mode .back-to-top,
+body.dark-mode .back-to-top {
+	background-color: #4557DD !important;
+	color: #ffffff !important;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+html.dark-mode .back-to-top:hover,
+body.dark-mode .back-to-top:hover {
+	background-color: #60a5fa !important;
+	color: #0f131a !important;
+}
+
+html.disable-translucency .back-to-top,
+body.disable-translucency .back-to-top {
+	border: 2px solid #1c2140 !important;
+	box-shadow: none !important;
+}
+
+html.dark-mode.disable-translucency .back-to-top,
+body.dark-mode.disable-translucency .back-to-top {
+	background-color: #0b0f19 !important;
+	border: 2px solid #ffffff !important;
+	color: #ffffff !important;
+	box-shadow: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   KEYBOARD NAVIGATION & FOCUS VISIBILITY
+   -------------------------------------------------------------------------- */
+:is(a, button, input, textarea, select, [tabindex]):focus-visible {
+	outline: 3px solid #4557DD !important;
+	outline-offset: 3px !important;
+}
+
+html.dark-mode :is(a, button, input, textarea, select, [tabindex]):focus-visible,
+body.dark-mode :is(a, button, input, textarea, select, [tabindex]):focus-visible {
+	outline: 3px solid #60a5fa !important;
+	outline-offset: 3px !important;
+}
+
+/* Highlight the full card container for accordions so overflow:hidden never clips the focus ring */
+.program-header:focus-visible,
+.acordeon-btn:focus-visible {
+	outline: none !important;
+}
+
+.program:has(.program-header:focus-visible),
+.acordeon:has(.acordeon-btn:focus-visible) {
+	outline: 3px solid #4557DD !important;
+	outline-offset: 2px !important;
+	border-color: #4557DD !important;
+}
+
+html.dark-mode .program:has(.program-header:focus-visible),
+body.dark-mode .program:has(.program-header:focus-visible),
+html.dark-mode .acordeon:has(.acordeon-btn:focus-visible),
+body.dark-mode .acordeon:has(.acordeon-btn:focus-visible) {
+	outline: 3px solid #60a5fa !important;
+	outline-offset: 2px !important;
+	border-color: #60a5fa !important;
+	background-color: #273549 !important;
 }

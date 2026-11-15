@@ -7,12 +7,14 @@
 	<meta name="description" content="Sobre SC-TECH de Puerto Rico - Nuestra historia, misión y visión.">
 	<title>About Us | SC-TECH de Puerto Rico</title>
 	<link rel="stylesheet" href="../assets/css/about-us.css">
+	<link rel="stylesheet" href="../assets/css/home.css">
 	<script src="../assets/js/accessibility.js" defer></script>
+	<script src="../assets/js/about_us.js" defer></script>
 </head>
 
 <body>
 
-	<!-- Script para validar y cargar modos de accesibilidad antes de que cargue el cuerpo; problema en FireFox -->
+	<!-- Script para validar y cargar modos de accesibilidad antes de que cargue el cuerpo -->
 	<script>
 		(function () {
 			var dark = localStorage.getItem('theme_dark');
@@ -25,19 +27,21 @@
 	</script>
 
 	<header class="header">
+		<a class="skip-link" href="#main-content">Ir al contenido</a>
 		<nav class="header-nav" aria-label="Navegación principal">
 			<a class="brand" href="../index.html">
 				<span class="brand-icon">
-					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40">
+					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40" height="41">
 				</span>
-				<div style="color: #494fdb">SC-TECH<span>DE PUERTO RICO</span></div>
+				<div class="brand-name">SC-TECH<span>DE PUERTO RICO</span></div>
 			</a>
 			<div class="nav-links">
 				<a class="btn-nav-rounded" href="../index.html">Inicio <span aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded" href="ofertas-academicas.html">Ofertas académicas <span
 						aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded" href="Campus_Map.html">Campus Map <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded active" href="about-us.html">About us <span aria-hidden="true">↗</span></a>
+				<a class="btn-nav-rounded active" href="about-us.html" aria-current="page">About us <span
+						aria-hidden="true">↗</span></a>
 
 				<!-- Contenedor para botón de accesibilidad -->
 				<div class="a11y-dropdown">
@@ -69,13 +73,83 @@
 		</nav>
 	</header>
 
-	<main>
-		<!-- Contenido principal para el grupo -->
-		<section class="page-content">
-			<h1>About Us</h1>
-			<p>Espacio reservado para el contenido de Sobre Nosotros...</p>
+	<main id="main-content" tabindex="-1">
+		<section class="about-hero" aria-labelledby="about-title">
+			<p class="eyebrow">SC-TECH · PUERTO RICO</p>
+			<h1 id="about-title">Aprender para <em>imaginar</em> lo que sigue.</h1>
+			<p class="hero-copy">Como ya has visto, La Universidad de SC-Tech de Puerto Rico es una especializada en Ciencias
+				de Computadoras con la intención de crear los mejores programadores del mundo. Esta universidad te dará muchas
+				experiencias necesarias para ayudarte convertirte en excelente profesional. Tenemos una educación bien practica
+				y cálida, con un estilo, moderno, además tenemos los mejores profesores especializados de ciencias de cómputos
+				de Puerto Rico al lado tuyo enseñándote las etapas desde lo más básico, hasta lo más avanzado. Nuestro campo es
+				bien accesible, seguro y conveniente para todos los estudiantes de nuestro recinto, tenemos de todo aquí en la
+				universidad de SC-TECH. Nosotros sabemos la importancia de sentirse seguro en un ambiento nuevo, aquí en SC-TECH
+				tenemos tu espalda. En nuestro campo, nuestro estacionamiento está bajo vigilancia 24/7. También tenemos
+				servicios de emergencias dentro de la universidad con un helicóptero lista a todos momentos. </p>
+		</section>
+
+		<section class="about-grid" aria-label="Conoce SC-TECH">
+			<article class="about-card">
+				<span class="card-number" aria-hidden="true">01</span>
+				<h2>Nuestra misión</h2>
+				<p>Aspiramos en tener estudiantes graduados en todas las esquinas del mundo, que estén haciendo un impacto
+					global en el campo de informática. Porque en SC-TECH no solo enseñamos tecnología, preparamos a quienes
+					construirán el futuro digital.</p>
+			</article>
+			<article class="about-card about-card-accent">
+				<span class="card-number" aria-hidden="true">02</span>
+				<h2>Nuestra visión</h2>
+				<p>Desarrollar los mejores profesionales para el futuro de Ciencias de Cómputos de no solo Puerto Rico, pero del
+					Mundo.</p>
+			</article>
+		</section>
+
+		<section class="contact-section" aria-labelledby="contact-title">
+			<div class="contact-details">
+				<p class="eyebrow">HABLEMOS</p>
+				<h2 id="contact-title">¿Tienes alguna pregunta?</h2>
+				<p>Escríbenos usando el formulario o consulta nuestros datos de muestra.</p>
+				<dl class="contact-list">
+					<div>
+						<dt>Ubicación de muestra</dt>
+						<dd>Centro Universitario Demo, San Juan, Puerto Rico</dd>
+					</div>
+					<div>
+						<dt>Teléfono de muestra</dt>
+						<dd><a href="tel:+17875550142">+1 (787) 555-0142</a></dd>
+					</div>
+					<div>
+						<dt>Correo de muestra</dt>
+						<dd><a href="mailto:contacto@example.com">contacto@example.com</a></dd>
+					</div>
+				</dl>
+				<p class="demo-note">Estos datos son ficticios y se incluyen únicamente como demostración del proyecto.</p>
+			</div>
+
+			<form class="contact-form" id="contactForm">
+				<h3>Formulario de contacto</h3>
+				<p class="form-note">Demostración visual: el formulario no envía ni guarda mensajes.</p>
+				<label for="name">Nombre</label>
+				<input id="name" name="name" type="text" placeholder="Tu nombre" autocomplete="name" required>
+				<label for="email">Correo electrónico</label>
+				<input id="email" name="email" type="email" placeholder="nombre@ejemplo.com" autocomplete="email" required>
+				<label for="subject">Asunto</label>
+				<input id="subject" name="subject" type="text" placeholder="¿Sobre qué quieres hablar?" required>
+				<label for="message">Mensaje</label>
+				<textarea id="message" name="message" rows="4" placeholder="Escribe aquí tu mensaje…" required></textarea>
+				<button class="submit-button" type="submit">Enviar mensaje <span aria-hidden="true">↗</span></button>
+				<p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
+			</form>
 		</section>
 	</main>
+
+	<button type="button" class="back-to-top" id="backToTop" aria-label="Volver arriba" title="Volver arriba">
+		<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+			stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+			<path d="M12 19V5" />
+			<path d="m5 12 7-7 7 7" />
+		</svg>
+	</button>
 
 	<footer>
 		<span>SCTECH de Puerto Rico</span>

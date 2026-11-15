@@ -7,8 +7,8 @@
 	<meta name="description"
 		content="Campus Map de SC-TECH de Puerto Rico.Explora las instalaciones y edificios del recinto.">
 	<title>Campus Map | SC-TECH de Puerto Rico</title>
-
 	<link rel="stylesheet" href="../assets/css/Campus_Map.css">
+	<link rel="stylesheet" href="../assets/css/home.css">
 	<script src="../assets/js/accessibility.js" defer></script>
 	<script src="../assets/js/acordeon_Jayden.js" defer></script>
 </head>
@@ -28,12 +28,13 @@
 	</script>
 
 	<header class="header">
+		<a class="skip-link" href="#main-content">Ir al contenido</a>
 		<nav class="header-nav" aria-label="Navegación principal">
 			<a class="brand" href="../index.html">
 				<span class="brand-icon">
-					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40">
+					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40" height="41">
 				</span>
-				<div style="color: #494fdb">SC-TECH<span>DE PUERTO RICO</span></div>
+				<div class="brand-name">SC-TECH<span>DE PUERTO RICO</span></div>
 			</a>
 			<div class="nav-links">
 				<a class="btn-nav-rounded" href="../index.html">Inicio <span aria-hidden="true">↗</span></a>
@@ -72,7 +73,7 @@
 		</nav>
 	</header>
 
-	<main>
+	<main id="main-content" tabindex="-1">
 		<!-- Contenedor para el texto descriptivo -->
 		<section>
 			<h1>Recinto Virtual 3D - SC-TECH</h1>
@@ -255,16 +256,61 @@
 			Referencias:	https://www.w3schools.com/tags/tag_iframe.asp
 										https://www.w3schools.com/html/html_iframe.asp
 		-->
-		<section class="map-wrapper">
-			<iframe src="mapa-virtual.html" title="Map 3D Interactivo de SC-Tech" allow="fullscreen"></iframe>
-		</section>
-	</main>
+		<section class="map-wrapper" id="mapContainer">
+			<div class="map-overlay" id="mapOverlay">
+				<div class="map-overlay-content">
+					<img src="../assets/images/ofertas/Campus_Building.png" alt="Vista previa del recinto SC-TECH"
+						class="map-preview-img">
+					<h2>Mapa Interactivo 3D</h2>
+					<p>Explora los 9 edificios del recinto en primera persona o vista orbital. Haz clic abajo para iniciar el
+						entorno 3D.</p>
+					<button type="button" class="btn-load-map" id="btnLoadMap">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+							stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<polygon points="5 3 19 12 5 21 5 3"></polygon>
+						</svg>
+						Cargar Mapa 3D
+					</button>
+				</div>
+			</div>
 
-	<footer>
-		<span>SCTECH de Puerto Rico</span>
-		<span>Tu talento. Tu camino. Tu futuro.</span>
-		<span>© 2026 SCTECH</span>
-	</footer>
+			<iframe id="virtualMapFrame" data-src="mapa-virtual.html" title="Map 3D Interactivo de SC-Tech" allow="fullscreen"
+				hidden>
+			</iframe>
+		</section>
+
+		<footer>
+			<span>SCTECH de Puerto Rico</span>
+			<span>Tu talento. Tu camino. Tu futuro.</span>
+			<span>© 2026 SCTECH</span>
+		</footer>
+
+		<script>
+			(function () {
+				const btnLoadMap = document.getElementById('btnLoadMap');
+				const mapOverlay = document.getElementById('mapOverlay');
+				const mapFrame = document.getElementById('virtualMapFrame');
+
+				if (!btnLoadMap || !mapOverlay || !mapFrame) return;
+
+				btnLoadMap.addEventListener('click', function () {
+					btnLoadMap.disabled = true;
+					btnLoadMap.textContent = 'Cargando entorno 3D…';
+
+					// Reveal iframe and assign src to start 3D initialization
+					mapFrame.hidden = false;
+					mapFrame.src = mapFrame.dataset.src;
+
+					// Fade out overlay once the iframe finishes loading
+					mapFrame.addEventListener('load', function () {
+						mapOverlay.classList.add('is-hidden');
+						setTimeout(function () {
+							mapOverlay.remove();
+						}, 350);
+					}, { once: true });
+				});
+			})();
+		</script>
 
 </body>
 

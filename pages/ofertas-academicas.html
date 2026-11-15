@@ -7,12 +7,14 @@
 	<meta name="description" content="Ofertas Académicas de SC-TECH de Puerto Rico - Explora nuestros programas.">
 	<title>Ofertas Académicas | SC-TECH de Puerto Rico</title>
 	<link rel="stylesheet" href="../assets/css/ofertas-academicas.css">
+	<link rel="stylesheet" href="../assets/css/home.css">
 	<script src="../assets/js/accessibility.js" defer></script>
+	<script src="../assets/js/ofertas-academicas.js" defer></script>
 </head>
 
 <body>
 
-	<!-- Script para validar y cargar modos de accesibilidad antes de que cargue el cuerpo; problema en FireFox -->
+	<!-- Script para validar y cargar modos de accesibilidad antes de que cargue el cuerpo -->
 	<script>
 		(function () {
 			var dark = localStorage.getItem('theme_dark');
@@ -25,16 +27,17 @@
 	</script>
 
 	<header class="header">
+		<a class="skip-link" href="#main-content">Ir al contenido</a>
 		<nav class="header-nav" aria-label="Navegación principal">
 			<a class="brand" href="../index.html">
 				<span class="brand-icon">
-					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40">
+					<img src="../assets/images/SC-Tech_Logo.png" alt="College Logo" width="40" height="41">
 				</span>
-				<div style="color: #494fdb">SC-TECH<span>DE PUERTO RICO</span></div>
+				<div class="brand-name">SC-TECH<span>DE PUERTO RICO</span></div>
 			</a>
 			<div class="nav-links">
 				<a class="btn-nav-rounded" href="../index.html">Inicio <span aria-hidden="true">↗</span></a>
-				<a class="btn-nav-rounded active" href="ofertas-academicas.html">Ofertas académicas <span
+				<a class="btn-nav-rounded active" href="ofertas-academicas.html" aria-current="page">Ofertas académicas <span
 						aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded" href="Campus_Map.html">Campus Map <span aria-hidden="true">↗</span></a>
 				<a class="btn-nav-rounded" href="about-us.html">About us <span aria-hidden="true">↗</span></a>
@@ -69,11 +72,521 @@
 		</nav>
 	</header>
 
-	<main>
-		<!-- Contenido principal para el grupo -->
-		<section class="page-content">
-			<h1>Ofertas Académicas</h1>
-			<p>Espacio reservado para el contenido de Ofertas Académicas...</p>
+	<main id="main-content" tabindex="-1">
+		<!-- HERO -->
+		<section class="hero">
+			<div class="hero-text">
+				<div class="tag">
+					<span>●</span> OFERTA ACADÉMICA
+				</div>
+
+				<h1>
+					Nuestra<br>
+					Oferta <span>Académica</span>
+				</h1>
+
+				<p>
+					Programas enfocados en las Ciencias de Computación
+					y las nuevas tecnologías, con una formación práctica,
+					innovadora y alineada a la industria.
+				</p>
+			</div>
+
+			<!-- MAP PLACEHOLDER -->
+			<div class="map-placeholder" id="campus" role="img" aria-label="Espacio reservado para el mapa del campus">
+				<img src="../assets/images/ofertas/Campus_Building.png">
+			</div>
+		</section>
+
+		<!-- PROGRAMS + INFO PANEL -->
+		<section class="main-content" id="oferta">
+			<div class="program-list">
+				<p class="program-group-label">Programa principal</p>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-1" aria-expanded="false"
+						aria-controls="prog-panel-1">
+						<span class="program-icon" aria-hidden="true">💻</span>
+						<span class="program-info">
+							<span class="program-title">Ciencias de Computación (Computer Science)</span>
+							<span class="program-summary">Fundamentos y especialidades en programación y computación.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/cs.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-1" role="region" aria-labelledby="prog-btn-1">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Especialidad general. Ofrece los conocimientos básicos de todas las especialidades tecnológicas
+									disponibles en SC-TECH, permitiendo a los estudiantes conocer diferentes áreas de la computación antes
+									de especializarse.</p>
+								<div class="course-group">
+									<p class="course-label">Especialidades disponibles</p>
+									<ul class="course-list">
+										<li>Desarrollo de Software</li>
+										<li>Desarrollo Web</li>
+										<li>Aplicaciones Móviles</li>
+										<li>Inteligencia Artificial y Ciencia de Datos</li>
+										<li>Ciberseguridad</li>
+										<li>Computación en la Nube</li>
+										<li>Bases de Datos</li>
+										<li>Redes y Sistemas</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<p class="program-group-label">Especialidades</p>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-2" aria-expanded="false"
+						aria-controls="prog-panel-2">
+						<span class="program-icon" aria-hidden="true">👨‍💻</span>
+						<span class="program-info">
+							<span class="program-title">Desarrollo de Software</span>
+							<span class="program-summary">Diseño, creación y mantenimiento de programas y aplicaciones.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/software.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-2" role="region" aria-labelledby="prog-btn-2">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se enfoca en el diseño, creación y mantenimiento de programas y aplicaciones informáticas. Los
+									estudiantes aprenderán los fundamentos necesarios para desarrollar soluciones tecnológicas utilizando
+									diferentes lenguajes de programación.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Programación en C++</li>
+										<li>Programación en Python</li>
+										<li>Programación en Java</li>
+										<li>Programación en C#</li>
+										<li>Programación en Go (Golang)</li>
+										<li>Programación en Rust</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-3" aria-expanded="false"
+						aria-controls="prog-panel-3">
+						<span class="program-icon" aria-hidden="true">🌐</span>
+						<span class="program-info">
+							<span class="program-title">Desarrollo Web</span>
+							<span class="program-summary">Creación de páginas web y aplicaciones digitales.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/web.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-3" role="region" aria-labelledby="prog-btn-3">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se especializa en la creación y mantenimiento de páginas y aplicaciones web modernas. Los estudiantes
+									adquirirán conocimientos sobre el desarrollo de interfaces, servidores y sistemas que permiten el
+									funcionamiento de plataformas digitales.</p>
+								<div class="course-group">
+									<p class="course-label">Front-End (lo que ve el usuario)</p>
+									<ul class="course-list">
+										<li>HTML</li>
+										<li>CSS</li>
+										<li>JavaScript</li>
+										<li>React</li>
+										<li>Angular</li>
+										<li>Vue.js</li>
+									</ul>
+								</div>
+								<div class="course-group">
+									<p class="course-label">Back-End (servidor)</p>
+									<ul class="course-list">
+										<li>Node.js</li>
+										<li>Python (Django, Flask)</li>
+										<li>PHP</li>
+										<li>Java Spring</li>
+										<li>ASP.NET</li>
+									</ul>
+								</div>
+								<p class="course-note">Full Stack: combina Front-End y Back-End.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-4" aria-expanded="false"
+						aria-controls="prog-panel-4">
+						<span class="program-icon" aria-hidden="true">📱</span>
+						<span class="program-info">
+							<span class="program-title">Desarrollo de Aplicaciones Móviles</span>
+							<span class="program-summary">Diseño y programación de aplicaciones para iOS y Android.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/mobile.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-4" role="region" aria-labelledby="prog-btn-4">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se enfoca en el diseño y desarrollo de aplicaciones para dispositivos móviles. Los estudiantes
+									aprenderán a crear soluciones digitales funcionales e interactivas para diferentes sistemas
+									operativos.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Android (Java, Kotlin)</li>
+										<li>iOS (Swift)</li>
+										<li>Flutter</li>
+										<li>React Native</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-5" aria-expanded="false"
+						aria-controls="prog-panel-5">
+						<span class="program-icon" aria-hidden="true">🤖</span>
+						<span class="program-info">
+							<span class="program-title">Inteligencia Artificial y Ciencia de Datos</span>
+							<span class="program-summary">Sistemas inteligentes, análisis de datos y aprendizaje automático.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/ai.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-5" role="region" aria-labelledby="prog-btn-5">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Explora las tecnologías que permiten a las computadoras analizar información, identificar patrones y
+									desarrollar sistemas inteligentes. Los estudiantes adquirirán conocimientos sobre aprendizaje
+									automático, procesamiento de datos y aplicaciones de inteligencia artificial.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Python para IA</li>
+										<li>Machine Learning</li>
+										<li>Deep Learning</li>
+										<li>Ciencia de Datos</li>
+										<li>Análisis de Datos</li>
+										<li>Redes Neuronales</li>
+										<li>Procesamiento de Lenguaje Natural (NLP)</li>
+									</ul>
+								</div>
+								<div class="course-group">
+									<p class="course-label">Herramientas</p>
+									<ul class="course-list">
+										<li>Python</li>
+										<li>Pandas</li>
+										<li>NumPy</li>
+										<li>TensorFlow</li>
+										<li>PyTorch</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-6" aria-expanded="false"
+						aria-controls="prog-panel-6">
+						<span class="program-icon" aria-hidden="true">🔐</span>
+						<span class="program-info">
+							<span class="program-title">Ciberseguridad</span>
+							<span class="program-summary">Protección de sistemas informáticos, redes y datos digitales.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/cyber.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-6" role="region" aria-labelledby="prog-btn-6">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se enfoca en la protección de sistemas informáticos, redes y datos frente a amenazas digitales. Los
+									estudiantes aprenderán a identificar vulnerabilidades, prevenir ataques y aplicar estrategias de
+									seguridad tecnológica.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Ethical Hacking</li>
+										<li>Pentesting</li>
+										<li>Seguridad en Redes</li>
+										<li>Análisis Forense Digital</li>
+										<li>Seguridad en la Nube</li>
+									</ul>
+								</div>
+								<div class="course-group">
+									<p class="course-label">Certificaciones populares</p>
+									<ul class="course-list">
+										<li>CompTIA Security+</li>
+										<li>CEH</li>
+										<li>CISSP</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-7" aria-expanded="false"
+						aria-controls="prog-panel-7">
+						<span class="program-icon" aria-hidden="true">☁️</span>
+						<span class="program-info">
+							<span class="program-title">Computación en la Nube (Cloud Computing)</span>
+							<span class="program-summary">Administración de servicios e infraestructura en la nube.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/cloud.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-7" role="region" aria-labelledby="prog-btn-7">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Introduce las tecnologías que permiten almacenar, administrar y procesar información mediante
+									servicios en la nube. Los estudiantes aprenderán los fundamentos de las infraestructuras digitales y
+									su aplicación en entornos empresariales.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Microsoft Azure</li>
+										<li>AWS (Amazon Web Services)</li>
+										<li>Google Cloud Platform</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-8" aria-expanded="false"
+						aria-controls="prog-panel-8">
+						<span class="program-icon" aria-hidden="true">🗄️</span>
+						<span class="program-info">
+							<span class="program-title">Bases de Datos</span>
+							<span class="program-summary">Diseño, organización y administración de información digital.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/db.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-8" role="region" aria-labelledby="prog-btn-8">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se especializa en la organización, almacenamiento y administración de información digital. Los
+									estudiantes aprenderán a diseñar y gestionar sistemas que permitan acceder a los datos de manera
+									eficiente y segura.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>SQL</li>
+										<li>MySQL</li>
+										<li>PostgreSQL</li>
+										<li>Oracle Database</li>
+										<li>MongoDB</li>
+										<li>Diseño de bases de datos</li>
+										<li>Consultas SQL</li>
+										<li>Administración de datos</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-9" aria-expanded="false"
+						aria-controls="prog-panel-9">
+						<span class="program-icon" aria-hidden="true">🔗</span>
+						<span class="program-info">
+							<span class="program-title">Redes y Sistemas</span>
+							<span class="program-summary">Configuración, mantenimiento y administración de sistemas.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/redes.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-9" role="region" aria-labelledby="prog-btn-9">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se enfoca en la instalación, configuración y administración de redes y sistemas informáticos. Los
+									estudiantes adquirirán conocimientos sobre conectividad, servidores y mantenimiento de
+									infraestructuras tecnológicas.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Administración de Windows Server</li>
+										<li>Linux</li>
+										<li>Cisco CCNA</li>
+										<li>Virtualización</li>
+										<li>Administración de redes</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<p class="program-group-label">Programas asociados</p>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-10" aria-expanded="false"
+						aria-controls="prog-panel-10">
+						<span class="program-icon" aria-hidden="true">🎮</span>
+						<span class="program-info">
+							<span class="program-title">Desarrollo de Videojuegos</span>
+							<span class="program-summary">Creación de videojuegos y experiencias digitales interactivas.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/games.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-10" role="region" aria-labelledby="prog-btn-10">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Introduce los fundamentos del diseño, programación y creación de videojuegos. Los estudiantes
+									aprenderán a desarrollar experiencias interactivas mediante herramientas y tecnologías utilizadas en
+									la industria.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Unity (C#)</li>
+										<li>Unreal Engine (C++)</li>
+										<li>Diseño de videojuegos</li>
+										<li>Realidad Virtual y Aumentada</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-11" aria-expanded="false"
+						aria-controls="prog-panel-11">
+						<span class="program-icon" aria-hidden="true">♾️</span>
+						<span class="program-info">
+							<span class="program-title">Automatización y DevOps</span>
+							<span class="program-summary">Automatización de procesos y administración del desarrollo de
+								software.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/devops.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-11" role="region" aria-labelledby="prog-btn-11">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Se enfoca en la optimización y automatización de los procesos de desarrollo y administración de
+									software. Los estudiantes aprenderán técnicas que permiten mejorar la colaboración, eficiencia y
+									entrega de aplicaciones tecnológicas.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Git y GitHub</li>
+										<li>Docker</li>
+										<li>Kubernetes</li>
+										<li>Jenkins</li>
+										<li>CI/CD</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="program">
+					<button type="button" class="program-header" id="prog-btn-12" aria-expanded="false"
+						aria-controls="prog-panel-12">
+						<span class="program-icon" aria-hidden="true">📊</span>
+						<span class="program-info">
+							<span class="program-title">Tecnología Empresarial</span>
+							<span class="program-summary">Gestión y optimización empresarial con herramientas tecnológicas.</span>
+						</span>
+						<span class="program-image" aria-hidden="true">
+							<img src="../assets/images/ofertas/de.jpg" alt="">
+						</span>
+						<span class="arrow" aria-hidden="true">⌄</span>
+					</button>
+					<div class="program-panel" id="prog-panel-12" role="region" aria-labelledby="prog-btn-12">
+						<div class="panel-inner">
+							<div class="panel-body">
+								<p>Explora el uso de herramientas digitales para mejorar la administración y productividad de las
+									organizaciones. Los estudiantes adquirirán conocimientos sobre análisis de información, automatización
+									de procesos y gestión de recursos empresariales.</p>
+								<div class="course-group">
+									<p class="course-label">Cursos</p>
+									<ul class="course-list">
+										<li>Power BI</li>
+										<li>Excel Avanzado</li>
+										<li>Microsoft Power Platform</li>
+										<li>SAP</li>
+										<li>CRM y ERP</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- WHY SC-TECH -->
+			<aside class="info-panel">
+				<h2>¿Por qué estudiar en SC-TECH?</h2>
+
+				<p>
+					Ofrecemos una educación de calidad, práctica y actualizada
+					en las Ciencias de Computación, con laboratorios modernos,
+					profesores especializados y programas alineados a la
+					industria tecnológica.
+				</p>
+
+				<div class="benefit">
+					<div class="benefit-icon">🎓</div>
+					Educación actualizada
+				</div>
+
+				<div class="benefit">
+					<div class="benefit-icon">&lt;/&gt;</div>
+					Proyectos prácticos
+				</div>
+
+				<div class="benefit">
+					<div class="benefit-icon">👥</div>
+					Profesores especializados
+				</div>
+
+				<div class="benefit">
+					<div class="benefit-icon">📈</div>
+					Preparación profesional
+				</div>
+
+				<a href="about-us.html#contactForm" class="cta">
+					¡Construye tu futuro en SC-TECH! ↗
+				</a>
+			</aside>
 		</section>
 	</main>
 

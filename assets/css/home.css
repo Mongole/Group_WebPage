@@ -4,8 +4,8 @@
   --home-ink: #1c2140;
   --home-muted: #4d536d;
   --home-line: #c7cbe0;
-  --home-link: #3544c6;
-  --home-focus: #4557dd;
+  --home-link: #4557DD;
+  --home-focus: #4557DD;
   --home-border-width: 1px;
 }
 
@@ -15,8 +15,8 @@ html.dark-mode {
   --home-ink: #f1f5f9;
   --home-muted: #bcc9dd;
   --home-line: #44546b;
-  --home-link: #b4c4ff;
-  --home-focus: #a8baff;
+  --home-link: #60a5fa;
+  --home-focus: #60a5fa;
 }
 
 html.disable-translucency {
@@ -36,7 +36,7 @@ html.dark-mode.disable-translucency {
 
 .header-nav {
   width: calc(100% - 96px);
-  max-width: 1280px;
+  max-width: 100%;
   margin: auto;
   padding: 18px 0;
 }
@@ -51,7 +51,7 @@ html.dark-mode.disable-translucency {
   letter-spacing: 1.3px;
 }
 
-.nav-links .btn-nav-rounded:not(.active):hover {
+html:not(.dark-mode) .nav-links .btn-nav-rounded:not(.active):hover {
   color: var(--home-link);
 }
 

@@ -91,17 +91,36 @@ body {
 
 /* Botones por Jayden */
 .btn-nav-rounded {
-	min-height: 42px;
-	padding: 10px 20px;
-	border-radius: 4px;
-	background: var(--azul-claro);
+	min-height: 44px;
+	padding: 12px 18px;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	background: transparent;
 	color: var(--oscuro);
 	font: 600 14px 'DM Sans', sans-serif;
 	text-decoration: none;
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-nav-rounded span {
+	transition: transform 0.2s ease;
+}
+
+.nav-links .btn-nav-rounded:hover {
+	background: var(--azul-claro);
+	color: var(--azul);
+}
+
+.nav-links .btn-nav-rounded.active {
+	background: var(--azul);
+	color: var(--blanco);
+}
+
+.btn-nav-rounded:hover span {
+	transform: translate(2px, -2px);
 }
 
 /* Acordeon por Jayden */
@@ -154,11 +173,6 @@ body {
 
 .acordeon-btn:hover {
 	background: var(--azul-claro);
-}
-
-.acordeon-btn:focus-visible {
-	outline: 3px solid var(--oscuro);
-	outline-offset: -3px;
 }
 
 /* 2.4 · Cuando el acordeón está ABIERTO (tiene la clase "abierto"),
@@ -268,26 +282,6 @@ body {
 	}
 }
 
-.btn-nav-rounded span {
-	font-size: 12px;
-	transition: transform 0.2s ease;
-}
-
-.btn-nav-rounded:hover,
-.btn-nav-rounded.active {
-	background: var(--azul);
-	color: var(--blanco);
-}
-
-.btn-nav-rounded:hover span {
-	transform: translate(2px, -2px);
-}
-
-.btn-nav-rounded:focus-visible {
-	outline: 3px solid var(--oscuro);
-	outline-offset: 3px;
-}
-
 /* Main Content Area */
 main {
 	flex: 1;
@@ -351,25 +345,6 @@ main {
 	font-size: 12px;
 }
 
-/* Estilo para contenedor de mapa virtual */
-.map-wrapper {
-	width: 100%;
-	height: 650px;
-	/* Fixed height frame inside layout */
-	border-radius: 16px;
-	overflow: hidden;
-	border: 1.5px solid var(--azul-claro);
-	box-shadow: 0 8px 30px rgba(28, 33, 64, 0.08);
-	background: #b8c9d1;
-}
-
-.map-wrapper iframe {
-	width: 100%;
-	height: 100%;
-	border: none;
-	display: block;
-}
-
 /* Footer */
 footer {
 	max-width: 1440px;
@@ -389,10 +364,6 @@ footer {
 		flex-direction: column;
 		padding: 14px 20px;
 		gap: 14px;
-	}
-
-	.map-wrapper {
-		height: 480px;
 	}
 
 	.nav-links {
@@ -417,14 +388,108 @@ footer {
 	}
 }
 
-@media (max-width: 480px) {
-	.btn-nav-rounded {
-		min-height: 38px;
-		padding: 8px 14px;
-		font-size: 13px;
-	}
+/*
+	Estilo para overlay del mapa virtual
+*/
+.map-wrapper {
+	position: relative;
+	width: 100%;
+	height: 650px;
+	border-radius: 16px;
+	overflow: hidden;
+	border: 1.5px solid var(--azul-claro);
+	box-shadow: 0 8px 30px rgba(28, 33, 64, 0.08);
+	background: radial-gradient(circle at 50% 45%, #ffffff 0%, #eef0fd 60%, #dde1fa 100%);
+}
 
-	.btn-nav-rounded span {
-		display: none;
-	}
+.map-wrapper iframe {
+	width: 100%;
+	height: 100%;
+	border: none;
+	display: block;
+}
+
+.map-wrapper iframe[hidden] {
+	display: none;
+}
+
+.map-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	display: grid;
+	place-items: center;
+	padding: 24px;
+	text-align: center;
+	background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.92) 0%, rgba(238, 240, 253, 0.96) 100%);
+	transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.map-overlay.is-hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.map-overlay-content {
+	max-width: 460px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+}
+
+.map-preview-img {
+	width: 240px;
+	max-width: 75%;
+	height: auto;
+	object-fit: contain;
+	margin-bottom: 6px;
+	filter: drop-shadow(0 12px 20px rgba(28, 33, 64, 0.16));
+}
+
+.map-overlay-content h2 {
+	font-family: 'Syne', sans-serif;
+	font-size: 26px;
+	font-weight: 800;
+	color: var(--oscuro);
+	margin: 0;
+}
+
+.map-overlay-content p {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #52606d;
+	margin: 0 0 8px;
+}
+
+.btn-load-map {
+	min-height: 48px;
+	padding: 12px 26px;
+	border: none;
+	border-radius: 10px;
+	background: var(--azul);
+	color: var(--blanco);
+	font: 700 15px 'DM Sans', sans-serif;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	cursor: pointer;
+	box-shadow: 0 8px 20px rgba(69, 87, 221, 0.3);
+	transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-load-map:hover:not(:disabled) {
+	background: var(--oscuro);
+	transform: translateY(-2px);
+}
+
+.btn-load-map:disabled {
+	opacity: 0.75;
+	cursor: wait;
+}
+
+.btn-load-map:focus-visible {
+	outline: 3px solid var(--oscuro);
+	outline-offset: 3px;
 }

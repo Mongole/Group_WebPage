@@ -97,3 +97,34 @@ if (chkLargeText) {
 		localStorage.setItem('theme_large_text', enabled);
 	});
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+	const a11yToggle = document.getElementById('a11yToggle');
+	const a11yMenu = document.getElementById('a11yMenu');
+	const a11yDropdown = document.querySelector('.a11y-dropdown');
+
+	if (!a11yToggle || !a11yMenu || !a11yDropdown) return;
+
+	function closeMenu(returnFocus = false) {
+		if (!a11yMenu.hidden) {
+			a11yMenu.hidden = true;
+			a11yToggle.setAttribute('aria-expanded', 'false');
+			if (returnFocus) a11yToggle.focus();
+		}
+	}
+
+	// Close on Escape and return focus to the accessibility button
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape' && !a11yMenu.hidden) {
+			e.preventDefault();
+			closeMenu(true);
+		}
+	});
+
+	// Close automatically when tabbing completely out of the dropdown
+	a11yDropdown.addEventListener('focusout', (e) => {
+		if (!a11yDropdown.contains(e.relatedTarget)) {
+			closeMenu(false);
+		}
+	});
+});
