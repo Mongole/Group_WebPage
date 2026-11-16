@@ -886,19 +886,20 @@ main:focus {
 @media (max-width: 600px) {
 	.header-nav {
 		width: 100% !important;
-		padding: 10px 16px !important;
-		display: flex !important;
-		flex-direction: row !important;
-		flex-wrap: wrap !important;
+		padding: 10px 14px !important;
+		display: grid !important;
+		grid-template-columns: 1fr auto !important;
+		grid-template-areas:
+			"brand a11y"
+			"links links" !important;
 		align-items: center !important;
-		justify-content: space-between !important;
-		gap: 8px !important;
-		position: relative !important;
+		row-gap: 8px !important;
+		column-gap: 8px !important;
 	}
 
 	/* Row 1, Left: Compact Brand Logo */
 	.brand {
-		order: 1 !important;
+		grid-area: brand !important;
 		gap: 8px !important;
 		font-size: 17px !important;
 	}
@@ -915,18 +916,13 @@ main:focus {
 		margin-top: 1px !important;
 	}
 
-	/* Make .nav-links transparent to flex layout so .a11y-dropdown joins Row 1 */
-	.nav-links {
-		display: contents !important;
-	}
-
-	/* Row 1, Right: Accessibility Button & Unclipped Dropdown */
-	.nav-links > .a11y-dropdown {
-		order: 2 !important;
+	/* Row 1, Right: Accessibility Button & Unclipped Menu */
+	.nav-links>.a11y-dropdown {
+		grid-area: a11y !important;
+		justify-self: end !important;
 		position: relative !important;
 		top: auto !important;
 		right: auto !important;
-		margin-left: auto !important;
 	}
 
 	.btn-a11y {
@@ -938,24 +934,31 @@ main:focus {
 	.a11y-menu {
 		right: 0 !important;
 		top: calc(100% + 8px) !important;
-		max-width: calc(100vw - 32px) !important;
+		max-width: calc(100vw - 28px) !important;
 		z-index: 9999 !important;
 	}
 
-	/* Row 2: Slim 4-Button Pill Strip (no overflow clipping) */
-	.nav-links > .btn-nav-rounded {
-		order: 3 !important;
-		flex: 1 1 auto !important;
-		justify-content: center !important;
-		text-align: center !important;
-		min-height: 34px !important;
-		padding: 6px 8px !important;
-		font-size: 11.5px !important;
-		border-radius: 8px !important;
-		white-space: nowrap !important;
+	/* Row 2: 4-Column Pill Strip Spanning Full Width */
+	.nav-links {
+		grid-area: links !important;
+		display: grid !important;
+		grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+		gap: 4px !important;
+		width: 100% !important;
 	}
 
-	.nav-links > .btn-nav-rounded span[aria-hidden="true"] {
+	.nav-links>.btn-nav-rounded {
+		min-height: 34px !important;
+		padding: 4px 4px !important;
+		font-size: 11px !important;
+		line-height: 1.15 !important;
+		border-radius: 8px !important;
+		justify-content: center !important;
+		text-align: center !important;
+		white-space: normal !important;
+	}
+
+	.nav-links>.btn-nav-rounded span[aria-hidden="true"] {
 		display: none !important;
 	}
 }
