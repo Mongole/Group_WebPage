@@ -101,7 +101,7 @@ Group_WebPage/
 
 | Page / Section | Team Members |
 | --- | --- |
-| **Home (`index.html`)** | Eli Samuel (Twinzz-git, Antonio, Jayden, Jorge |
+| **Home (`index.html`)** | Eli Samuel (Twinzz-git), Antonio, Jayden, Jorge |
 | **Academic Offerings (`ofertas-academicas.html`)** | Anjuan (Bright-AJ), Reynaldo, Yadiel |
 | **Campus Map (`Campus_Map.html`)** | Josean (Mongole), Alexander, Alexander, Christian |
 | **About Us (`about-us.html`)** | Julio, Ihan, Ricardo |
