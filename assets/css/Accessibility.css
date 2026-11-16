@@ -957,3 +957,66 @@ main:focus {
 		display: none !important;
 	}
 }
+
+/* --------------------------------------------------------------------------
+   LARGE TEXT & MOBILE OVERFLOW PROTECTION
+   -------------------------------------------------------------------------- */
+html,
+body {
+	max-width: 100%;
+	overflow-x: clip;
+}
+
+/* Allow long words, headings, and emails to wrap instead of widening the viewport */
+html.large-text :is(h1, h2, h3, p, a, dd, dt, li, span, label),
+body.large-text :is(h1, h2, h3, p, a, dd, dt, li, span, label) {
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+
+	/* Prevent flex/grid containers on ofertas-academicas & about-us from expanding past 100vw */
+	main,
+	section,
+	article,
+	aside,
+	.hero,
+	.hero-text,
+	.main-content,
+	.program-list,
+	.info-panel,
+	.about-hero,
+	.about-grid,
+	.about-card,
+	.contact-section,
+	.contact-details,
+	.contact-form {
+		min-width: 0 !important;
+		max-width: 100% !important;
+	}
+
+	/* Scale down oversized hero titles on phones when Texto Ampliado is enabled */
+	html.large-text .hero h1,
+	body.large-text .hero h1,
+	html.large-text .about-hero h1,
+	body.large-text .about-hero h1 {
+		font-size: clamp(1.85rem, 8.5vw, 2.5rem) !important;
+		line-height: 1.12 !important;
+		hyphens: auto;
+	}
+
+	/* Keep the 4 mobile nav pills from clipping when Large Text scales up font sizes */
+	html.large-text .nav-links>.btn-nav-rounded,
+	body.large-text .nav-links>.btn-nav-rounded {
+		font-size: 10.5px !important;
+		padding: 4px 2px !important;
+		overflow-wrap: anywhere !important;
+	}
+
+	/* Ensure the campus building preview image scales smoothly on mobile */
+	.map-placeholder img {
+		max-width: 100% !important;
+		height: auto !important;
+	}
+}
